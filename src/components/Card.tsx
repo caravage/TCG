@@ -22,10 +22,10 @@ export const isLandscape = (card: CardData) => card.k === 'e';
 
 const FULL_LAYOUT: VariantId[] = ['fullart', 'altart'];
 const ART_SHINE: VariantId[] = ['holo', 'signed', 'fullart', 'altart', 'rainbow'];
-const FRAME_SHINE: VariantId[] = ['bw', 'etched', 'gold', 'rainbow'];
+const FRAME_SHINE: VariantId[] = ['etched', 'gold', 'rainbow'];
 const SPARKLES: VariantId[] = ['fullart', 'altart', 'signed', 'gold', 'rainbow'];
 const CORNERS: VariantId[] = ['gold', 'altart', 'signed'];
-const SWEEP: VariantId[] = ['gold', 'fullart', 'altart', 'etched'];
+const SWEEP: VariantId[] = ['bw', 'gold', 'fullart', 'altart', 'etched'];
 
 export function Card({
   card,
@@ -43,9 +43,6 @@ export function Card({
   const oneOfOne = serial?.of === 1;
   const landscape = isLandscape(card);
   const full = FULL_LAYOUT.includes(variant);
-  // Art déco touches grow with rarity: filets from UR, arch + sun rays from L.
-  const deco = card.r >= 3;
-  const grand = card.r >= 4;
   // Alternate art uses the article's second image, or a re-framed crop of the main one.
   const sources = variant === 'altart' ? [card.alt, card.img] : [card.img];
   const classes = [
@@ -54,7 +51,6 @@ export function Card({
     `r-${rarity.key}`,
     `v-${variant}`,
     full ? 'is-full' : '',
-    grand && !full ? 'is-grand' : '',
     variant === 'altart' && !card.alt ? 'alt-crop' : '',
     serial ? 'is-numbered' : '',
     oneOfOne ? 'is-oneofone' : '',
@@ -75,9 +71,7 @@ export function Card({
         <div className="card__flipper">
           <div className="card__face card__front">
             <div className="card__bg" />
-            {grand && !full && <div className="card__rays" />}
             {FRAME_SHINE.includes(variant) && <div className="fx fx--frameshine" />}
-            {deco && !full && <div className="card__filets" />}
             <div className="card__layout">
               <div className="card__frame">
                 <div className="card__art">
@@ -102,7 +96,7 @@ export function Card({
                 </div>
               </div>
               <div className="card__plaque">
-                <div className="card__name">{card.t}</div>
+                <div className={`card__name ${nameSize(card.t)}`}>{card.t}</div>
                 <div className="card__desc">{card.d}</div>
                 <Timeline card={card} />
               </div>
@@ -112,7 +106,7 @@ export function Card({
             {(SPARKLES.includes(variant) || oneOfOne) && <div className="fx fx--sparkle" />}
             {(SWEEP.includes(variant) || oneOfOne) && <div className="fx fx--sweep" />}
             {(CORNERS.includes(variant) || oneOfOne) && <div className="fx fx--corners" />}
-            <RarityBadge rarity={card.r} gem={grand} className="card__badge" />
+            <RarityBadge rarity={card.r} className="card__badge" />
             <div className="fx fx--glare" />
           </div>
           <div className="card__face card__back">
@@ -122,6 +116,14 @@ export function Card({
       </div>
     </div>
   );
+}
+
+/** Long titles shrink instead of being cut. */
+function nameSize(t: string): string {
+  if (t.length > 40) return 'name--xs';
+  if (t.length > 28) return 'name--s';
+  if (t.length > 18) return 'name--m';
+  return '';
 }
 
 /** Mini timeline engraved in the plaque: where the card sits in history. */

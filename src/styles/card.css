@@ -81,55 +81,13 @@
   transform: rotateY(180deg);
 }
 
-/* ---------- rarity themes: the metal of frame and plaque ---------- */
+/* ---------- one look for every card: only the rarity badge changes ---------- */
 .card {
   --wood: linear-gradient(160deg, #2e231b, #15100c);
+  --metal: linear-gradient(160deg, #f1dfb0, #b08d4f 45%, #e3c98e 75%, #9c7a3e);
   --ink: #1c140a;
-  --line: transparent;
-}
-.card.r-common {
-  --metal: linear-gradient(160deg, #c2a582, #6d5238 55%, #a3825f);
-  --accent: #e1d0b4;
+  --accent: #f1dfb0;
   --glow: transparent;
-}
-.card.r-uncommon {
-  --metal: linear-gradient(160deg, #f0b890, #9a5430 50%, #d99064);
-  --accent: #ffcf97;
-  --glow: transparent;
-}
-.card.r-rare {
-  --metal: linear-gradient(160deg, #f6f8fb, #9aa7b8 50%, #e2e8ef);
-  --accent: #8cc0ff;
-  --glow: rgb(120 170 255 / 0.25);
-}
-.card.r-epic {
-  --metal: linear-gradient(160deg, #eadbff, #8c64cf 50%, #cdb4f5);
-  --accent: #d6b4ff;
-  --glow: rgb(180 120 255 / 0.4);
-  --line: rgb(205 180 245 / 0.55);
-}
-.card.r-legendary {
-  --metal: linear-gradient(135deg, #fff0bf, #d9a52a 30%, #8a6212 55%, #f6d573 80%);
-  --wood: radial-gradient(120% 70% at 50% 0%, #332616, #110c07 70%);
-  --accent: #ffe38f;
-  --glow: rgb(255 205 90 / 0.5);
-  --line: rgb(246 213 115 / 0.7);
-}
-.card.r-mythic {
-  --metal: linear-gradient(135deg, #ffe9a8, #c9971f 30%, #fff3c8 50%, #b8860b 75%, #ffe38f);
-  --wood: radial-gradient(120% 70% at 50% 0%, #25211c, #07060a 70%);
-  --accent: #fff;
-  --glow: rgb(255 215 120 / 0.45);
-  --line: rgb(246 213 115 / 0.75);
-}
-
-.card.r-epic .card__front,
-.card.r-legendary .card__front,
-.card.r-mythic .card__front {
-  box-shadow:
-    0 calc(var(--w) * 0.02) calc(var(--w) * 0.06) rgb(0 0 0 / 0.55),
-    0 0 0 1px rgb(0 0 0 / 0.6),
-    0 0 calc(var(--w) * 0.12) var(--glow);
 }
 
 .card__bg {
@@ -147,7 +105,6 @@
     radial-gradient(120% 80% at 50% 110%, rgb(0 0 0 / 0.35), transparent 60%);
 }
 /* Mythic: spinning prismatic ring around the card */
-.card.r-mythic .card__bg::before,
 .card.v-rainbow .card__bg::before {
   content: '';
   position: absolute;
@@ -170,33 +127,6 @@
   to {
     --angle: 360deg;
   }
-}
-
-/* Art déco: sun rays (L, M) and double filets (UR+) */
-.card__rays {
-  position: absolute;
-  left: 50%;
-  top: -24cqmin;
-  width: 160cqmin;
-  height: 100cqmin;
-  margin-left: -80cqmin;
-  pointer-events: none;
-  background: repeating-conic-gradient(from 180deg at 50% 0%, #f6d573 0 1.2deg, transparent 1.2deg 9deg);
-  opacity: 0.18;
-}
-.card.r-mythic .card__rays {
-  opacity: 0.34;
-}
-.card__filets {
-  position: absolute;
-  inset: 2.2cqmin;
-  z-index: 1;
-  border-radius: 3.4cqmin;
-  pointer-events: none;
-  box-shadow:
-    inset 0 0 0 0.4cqmin var(--line),
-    inset 0 0 0 1.4cqmin transparent,
-    inset 0 0 0 1.8cqmin var(--line);
 }
 
 /* ---------- layout ---------- */
@@ -226,9 +156,6 @@
     inset 0 0.6cqmin 0 rgb(255 255 255 / 0.35),
     0 2cqmin 5cqmin rgb(0 0 0 / 0.5);
 }
-.card.r-mythic .card__frame {
-  background: conic-gradient(from 200deg, #ff8a8a, #ffe38a, #9dffb0, #8ae4ff, #b08aff, #ff9be9, #ff8a8a);
-}
 .card__art {
   position: relative;
   z-index: 1;
@@ -249,14 +176,6 @@
   box-shadow: inset 0 0 0 0.9cqmin rgb(0 0 0 / 0.35), inset 0 0 4cqmin rgb(0 0 0 / 0.35);
   pointer-events: none;
 }
-/* Arched frame for L and M */
-.is-portrait.is-grand .card__frame {
-  border-radius: 50cqmin 50cqmin 1.6cqmin 1.6cqmin;
-}
-.is-portrait.is-grand .card__art {
-  border-radius: 47cqmin 47cqmin 0.8cqmin 0.8cqmin;
-}
-
 .card__img,
 .card__fallback {
   position: absolute;
@@ -307,20 +226,22 @@
 .card__name {
   font-weight: 800;
   font-size: 5.6cqmin;
-  line-height: 1.15;
+  line-height: 1.12;
   letter-spacing: -0.01em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 8cqmin;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.card__name.name--m {
+  font-size: 4.9cqmin;
+}
+.card__name.name--s {
+  font-size: 4.3cqmin;
+}
+.card__name.name--xs {
+  font-size: 3.8cqmin;
 }
 .is-landscape .card__name {
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
   padding-right: 6cqmin;
-  font-size: 5.8cqmin;
 }
 .card__desc {
   margin-top: 0.8cqmin;
@@ -630,23 +551,34 @@
   }
 }
 
-/* Black & white: silver film-strip frame */
+/* Black & white: polished black marble with platinum metal */
 .card.v-bw {
-  --wood: linear-gradient(180deg, #1c1c1c, #0a0a0a);
-  --accent: #eaeaea;
+  --wood: radial-gradient(120% 90% at 30% 10%, #2a2a2e, #0b0b0d 70%);
+  --metal: linear-gradient(160deg, #f4f5f7, #9ea3ab 45%, #e6e8ec 75%, #7d828a);
+  --accent: #e6e8ec;
 }
-.v-bw .card__front {
-  filter: grayscale(1) contrast(1.12) brightness(1.04);
+.v-bw .card__img {
+  filter: grayscale(1) contrast(1.15) brightness(1.03);
+}
+.card.v-bw {
+  --marble: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='560'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.007 0.013' numOctaves='5' seed='19'/%3E%3CfeColorMatrix type='matrix' values='0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3CfeFuncG type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3CfeFuncB type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
 }
 .card.v-bw .card__bg::before {
-  background:
-    linear-gradient(to bottom, rgb(235 235 235 / 0.9) 0 55%, transparent 55%) left 1cqmin top 1.2cqmin / 2.4cqmin 4.4cqmin repeat-y,
-    linear-gradient(to bottom, rgb(235 235 235 / 0.9) 0 55%, transparent 55%) right 1cqmin top 1.2cqmin / 2.4cqmin 4.4cqmin repeat-y;
+  background: var(--marble) center / cover;
+  mix-blend-mode: screen;
+  opacity: 0.6;
 }
-.is-landscape.v-bw .card__bg::before {
-  background:
-    linear-gradient(to right, rgb(235 235 235 / 0.9) 0 55%, transparent 55%) left 1.2cqmin top 1cqmin / 4.4cqmin 2.4cqmin repeat-x,
-    linear-gradient(to right, rgb(235 235 235 / 0.9) 0 55%, transparent 55%) left 1.2cqmin bottom 1cqmin / 4.4cqmin 2.4cqmin repeat-x;
+.v-bw .card__plaque {
+  --ink: #eef0f3;
+  background: var(--marble) 30% 70% / 260% auto, radial-gradient(120% 120% at 20% 0%, #26262b, #0c0c0e);
+  background-blend-mode: screen;
+  box-shadow: inset 0 0 0 0.5cqmin #c9ccd2, 0 1.2cqmin 3cqmin rgb(0 0 0 / 0.5);
+}
+.v-bw .card__name {
+  background: linear-gradient(180deg, #ffffff, #b9bdc4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .v-bw .fx--frameshine {
   --holo: repeating-linear-gradient(115deg, #555 0%, #fff 8%, #888 16%, #eee 24%, #555 32%);
@@ -772,10 +704,6 @@
 .is-landscape.is-full .card__plaque {
   width: 58%;
   padding: 2.8cqmin 3.6cqmin;
-}
-.is-landscape.is-full .card__name {
-  -webkit-line-clamp: 1;
-  white-space: nowrap;
 }
 .is-landscape.is-full .card__desc {
   -webkit-line-clamp: 2;
