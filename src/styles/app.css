@@ -451,16 +451,17 @@ select {
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(188px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 34px 22px;
-  justify-items: center;
 }
 .grid__item {
   position: relative;
   cursor: pointer;
   content-visibility: auto;
-  contain-intrinsic-size: 188px 263px;
+  contain-intrinsic-size: auto 263px;
 }
 .missing {
   width: 188px;

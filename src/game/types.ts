@@ -21,6 +21,12 @@ export interface CardData {
   r: Rarity;
   /** Wikipedia article URL. */
   url: string;
+  /** 'p' = person (portrait card), 'e' = event or polity (landscape card). */
+  k?: 'p' | 'e';
+  /** Birth / start year (negative = BC). */
+  y1?: number;
+  /** Death / end year. */
+  y2?: number;
 }
 
 export interface CardSet {

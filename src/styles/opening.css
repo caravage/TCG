@@ -426,13 +426,16 @@
 }
 .reveal__stage {
   position: relative;
-  width: 330px;
+  width: 462px;
   height: 462px;
   cursor: pointer;
 }
 .reveal__under {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transform: translateY(calc(var(--i) * 10px)) scale(calc(1 - var(--i) * 0.04));
   filter: brightness(calc(1 - var(--i) * 0.2));
   z-index: calc(10 - var(--i));
@@ -440,6 +443,9 @@
 .reveal__current {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 20;
   animation: card-in 0.45s cubic-bezier(0.2, 1.2, 0.4, 1) both;
 }
@@ -580,6 +586,9 @@
 .tray__slot {
   width: 62px;
   height: 87px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 5px;
   border: 1px dashed rgb(255 255 255 / 0.15);
 }
@@ -587,8 +596,7 @@
   border: 0;
   animation: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both;
 }
-.tray__slot .card__foot,
-.tray__slot .card__desc {
+.tray__slot .card__plaque {
   visibility: hidden;
 }
 .tray__skip {
@@ -622,6 +630,7 @@
 .summary__grid {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
   gap: 26px 20px;
   max-width: 1000px;

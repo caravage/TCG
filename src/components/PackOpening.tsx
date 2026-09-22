@@ -3,7 +3,7 @@ import { openPack, type Pools } from '../game/pack';
 import { RARITIES } from '../game/rarity';
 import { VARIANT_BY_ID } from '../game/variants';
 import type { Pack, Pull } from '../game/types';
-import { Card } from './Card';
+import { Card, isLandscape } from './Card';
 import { CardModal } from './CardModal';
 import { PackVisual } from './PackVisual';
 import { PALETTES, burst } from './particles';
@@ -209,7 +209,7 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
             {pulls.map((p, i) => (
               <div key={p.uid} className={`tray__slot ${i < index || (i === index && flipped) ? 'is-filled' : ''}`}>
                 {(i < index || (i === index && flipped)) && (
-                  <Card card={p.card} variant={p.variant} serial={p.serial} width={62} interactive={false} />
+                  <Card card={p.card} variant={p.variant} serial={p.serial} width={isLandscape(p.card) ? 44 : 62} interactive={false} />
                 )}
               </div>
             ))}
