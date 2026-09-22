@@ -4,6 +4,7 @@ import { RARITIES } from '../game/rarity';
 import { VARIANT_BY_ID } from '../game/variants';
 import type { Pack, Pull } from '../game/types';
 import { Card } from './Card';
+import { CardModal } from './CardModal';
 import { PackVisual } from './PackVisual';
 import { PALETTES, burst } from './particles';
 
@@ -46,6 +47,7 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
   const [charging, setCharging] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [flash, setFlash] = useState(0);
+  const [sheet, setSheet] = useState<Pull | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const busy = useRef(false);
 
@@ -224,7 +226,12 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
           {testMode && <p className="summary__sub">Mode test — ces cartes ne sont pas enregistrées.</p>}
           <div className="summary__grid">
             {pulls.map((p, i) => (
-              <div key={p.uid} className="summary__item" style={{ '--d': `${i * 70}ms` } as CSSProperties}>
+              <div
+                key={p.uid}
+                className="summary__item"
+                style={{ '--d': `${i * 70}ms` } as CSSProperties}
+                onClick={() => setSheet(p)}
+              >
                 <Card card={p.card} variant={p.variant} serial={p.serial} width={196} />
                 {p.isNew && <span className="badge-new">Nouveau</span>}
               </div>
@@ -238,7 +245,11 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
               Voir le cahier
             </button>
           </div>
+          <p className="summary__tip">Clique sur une carte pour voir sa fiche.</p>
         </div>
+      )}
+      {sheet && (
+        <CardModal card={sheet.card} variant={sheet.variant} serial={sheet.serial} onClose={() => setSheet(null)} />
       )}
     </section>
   );

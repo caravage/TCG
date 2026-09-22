@@ -4,17 +4,19 @@ export interface RarityInfo {
   id: Rarity;
   key: string;
   label: string;
+  /** Initials shown on the card. */
+  short: string;
   /** Share of the corpus in this tier (by page-view percentile, most viewed = rarest). */
   share: number;
 }
 
 export const RARITIES: RarityInfo[] = [
-  { id: 0, key: 'common', label: 'Commune', share: 0.58 },
-  { id: 1, key: 'uncommon', label: 'Peu commune', share: 0.25 },
-  { id: 2, key: 'rare', label: 'Rare', share: 0.11 },
-  { id: 3, key: 'epic', label: 'Épique', share: 0.045 },
-  { id: 4, key: 'legendary', label: 'Légendaire', share: 0.012 },
-  { id: 5, key: 'mythic', label: 'Mythique', share: 0.003 },
+  { id: 0, key: 'common', label: 'Commune', short: 'C', share: 0.58 },
+  { id: 1, key: 'uncommon', label: 'Peu commune', short: 'UC', share: 0.25 },
+  { id: 2, key: 'rare', label: 'Rare', short: 'R', share: 0.11 },
+  { id: 3, key: 'epic', label: 'Ultra Rare', short: 'UR', share: 0.045 },
+  { id: 4, key: 'legendary', label: 'Légendaire', short: 'L', share: 0.012 },
+  { id: 5, key: 'mythic', label: 'Mythique', short: 'M', share: 0.003 },
 ];
 
 type Odds = [Rarity, number][];

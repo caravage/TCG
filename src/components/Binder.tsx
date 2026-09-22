@@ -1,9 +1,10 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { RARITIES } from '../game/rarity';
-import { VARIANT_BY_ID, VARIANT_ORDER } from '../game/variants';
+import { VARIANT_ORDER } from '../game/variants';
 import type { Entry, SaveData } from '../game/storage';
 import type { CardData, Rarity } from '../game/types';
-import { Card, Pips } from './Card';
+import { Card, RarityBadge } from './Card';
+import { CardModal } from './CardModal';
 
 interface Props {
   cards: CardData[];
@@ -97,7 +98,7 @@ export function Binder({ cards, byId, save, testMode }: Props) {
             onClick={() => setRarity(rarity === r.id ? 'all' : r.id)}
           >
             <span className="rarity-bar__label">
-              <Pips rarity={r.id} /> {r.label}
+              <RarityBadge rarity={r.id} /> {r.label}
             </span>
             <span className="rarity-bar__count">
               {r.owned}/{r.total}
@@ -146,63 +147,22 @@ export function Binder({ cards, byId, save, testMode }: Props) {
           <div key={c.id} className={`grid__item grid__missing r-${RARITIES[c.r].key}`}>
             <div className="missing">
               <span className="missing__no">Nº {String(c.n).padStart(4, '0')}</span>
-              <Pips rarity={c.r} />
+              <RarityBadge rarity={c.r} />
               <span className="missing__q">?</span>
             </div>
           </div>
         ))}
       </div>
 
-      {selected && <CardModal {...selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <CardModal
+          card={selected.card}
+          variant={selected.entry?.variant ?? 'normal'}
+          serial={selected.entry?.serial}
+          entry={selected.entry}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </section>
-  );
-}
-
-function CardModal({ card, entry, onClose }: Selected & { onClose: () => void }) {
-  const variant = entry?.variant ?? 'normal';
-  return (
-    <div className="modal" onClick={onClose}>
-      <div className="modal__body" onClick={(e) => e.stopPropagation()}>
-        <Card card={card} variant={variant} serial={entry?.serial} width={380} />
-        <div className="modal__info">
-          <div className="modal__no">Nº {String(card.n).padStart(4, '0')}</div>
-          <h2>{card.t}</h2>
-          <p className="modal__desc">{card.d}</p>
-          <dl>
-            <dt>Rareté</dt>
-            <dd>{RARITIES[card.r].label}</dd>
-            <dt>Variante</dt>
-            <dd>
-              {VARIANT_BY_ID[variant].label}
-              {VARIANT_BY_ID[variant].blurb && <small> — {VARIANT_BY_ID[variant].blurb}</small>}
-            </dd>
-            {entry?.serial && (
-              <>
-                <dt>Numérotation</dt>
-                <dd>
-                  {entry.serial.num} / {entry.serial.of}
-                </dd>
-              </>
-            )}
-            <dt>Vues sur 12 mois</dt>
-            <dd>{card.views.toLocaleString('fr-FR')}</dd>
-            {entry && (
-              <>
-                <dt>Exemplaires</dt>
-                <dd>{entry.count}</dd>
-                <dt>Obtenue le</dt>
-                <dd>{new Date(entry.first).toLocaleString('fr-FR')}</dd>
-              </>
-            )}
-          </dl>
-          <a className="btn btn--ghost" href={card.url} target="_blank" rel="noreferrer">
-            Lire l’article sur Wikipédia ↗
-          </a>
-          <button className="btn btn--primary" onClick={onClose}>
-            Fermer
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }

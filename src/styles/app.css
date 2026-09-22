@@ -372,9 +372,11 @@ select {
   text-align: left;
   container-type: inline-size;
 }
-.rarity-bar .pips i {
-  width: 6px;
-  height: 6px;
+.rarity-bar .rbadge,
+.missing .rbadge {
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 4px;
 }
 .rarity-bar.is-active {
   border-color: var(--accent);
@@ -477,8 +479,8 @@ select {
 .grid__missing {
   cursor: default;
 }
-.missing .pips i {
-  opacity: 0.5;
+.missing .rbadge {
+  opacity: 0.55;
 }
 .missing__no {
   font-family: 'Cinzel', serif;
@@ -526,15 +528,31 @@ select {
 }
 .modal__info h2 {
   margin: 0;
-  font-family: 'Cinzel', serif;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
   font-size: 30px;
   color: var(--gold);
 }
 .modal__desc {
   margin: 0;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 20px;
+  font-size: 17px;
+  line-height: 1.45;
+  color: rgb(239 231 214 / 0.85);
+}
+.modal__info dd .rbadge {
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+.modal__effect {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 99px;
+  background: rgb(230 201 132 / 0.15);
+  border: 1px solid var(--line);
+  color: var(--gold);
+  font-weight: 600;
 }
 .modal__info dl {
   display: grid;

@@ -45,23 +45,23 @@ commite le résultat. On peut la relancer à la main depuis l'onglet *Actions*.
 
 ### Raretés (plus consulté = plus rare, en percentiles)
 
-| Rareté      | Part du corpus | ≈ sur 3 000 |
+| Rareté (sigle) | Part du corpus | ≈ sur 3 000 |
 |-------------|---------------:|------------:|
-| Commune     | 58 %   | 1 740 |
-| Peu commune | 25 %   | 750 |
-| Rare        | 11 %   | 330 |
-| Épique      | 4,5 %  | 135 |
-| Légendaire  | 1,2 %  | 36 |
-| Mythique    | 0,3 %  | 9 |
+| Commune (C) | 58 %   | 1 740 |
+| Peu commune (UC) | 25 %   | 750 |
+| Rare (R) | 11 %   | 330 |
+| Ultra Rare (UR) | 4,5 %  | 135 |
+| Légendaire (L) | 1,2 %  | 36 |
+| Mythique (M) | 0,3 %  | 9 |
 
 ### Paquet de 7 cartes
 
 | Emplacement | Tirage |
 |---|---|
 | 1 à 5 | Commune 94 % · Peu commune 6 % |
-| 6 | Peu commune 84 % · Rare 12 % · Épique 3,2 % · Légendaire 0,8 % |
-| 7 (rare garantie) | Rare 78 % · Épique 17 % · Légendaire 4 % · Mythique 1 % |
-| **God pack** (1 / 1 500) | 7 cartes Rare+ : Rare 55 % · Épique 30 % · Légendaire 12 % · Mythique 3 % |
+| 6 | Peu commune 84 % · Rare 12 % · Ultra Rare 3,2 % · Légendaire 0,8 % |
+| 7 (rare garantie) | Rare 78 % · Ultra Rare 17 % · Légendaire 4 % · Mythique 1 % |
+| **God pack** (1 / 1 500) | 7 cartes Rare+ : Rare 55 % · Ultra Rare 30 % · Légendaire 12 % · Mythique 3 % |
 
 ### Variantes (par carte, indépendantes de la rareté)
 
@@ -70,10 +70,10 @@ commite le résultat. On peut la relancer à la main depuis l'onglet *Actions*.
 | Reverse Holo | 8 % |
 | Holo | 4 % |
 | Noir & Blanc | 1,5 % |
-| Couleurs inversées | 1 % |
+| Néon | 1 % |
 | Foil gravé | 0,8 % |
 | Full Art | 1 / 250 |
-| Alternate Art | 1 / 500 (si l'article a une 2ᵉ image) |
+| Alternate Art | 1 / 500 (2ᵉ image de l’article, sinon recadrage stylisé de la principale) |
 | Signée | 1 / 300 (seulement si la page a une signature) |
 | Gold | 1 / 1 250 |
 | Rainbow | 1 / 5 000 |

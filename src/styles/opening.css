@@ -642,3 +642,11 @@
   gap: 14px;
   margin-top: 8px;
 }
+.summary__item {
+  cursor: pointer;
+}
+.summary__tip {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}

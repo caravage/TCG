@@ -16,10 +16,10 @@ export const VARIANTS: VariantInfo[] = [
   { id: 'reverse', label: 'Reverse Holo', chance: 0.08, hit: 0, blurb: 'Le cadre scintille, pas l’illustration.' },
   { id: 'holo', label: 'Holo', chance: 0.04, hit: 0, blurb: 'L’illustration est holographique.' },
   { id: 'bw', label: 'Noir & Blanc', chance: 0.015, hit: 1, blurb: 'Tirage argentique monochrome.' },
-  { id: 'inverted', label: 'Couleurs inversées', chance: 0.01, hit: 1, blurb: 'Un négatif photographique.' },
+  { id: 'neon', label: 'Néon', chance: 0.01, hit: 1, blurb: 'Contours lumineux façon enseigne au néon.' },
   { id: 'etched', label: 'Foil gravé', chance: 0.008, hit: 1, blurb: 'Texture métallique gravée en relief.' },
   { id: 'fullart', label: 'Full Art', chance: 1 / 250, hit: 2, blurb: 'L’illustration couvre toute la carte.' },
-  { id: 'altart', label: 'Alternate Art', chance: 1 / 500, hit: 2, blurb: 'Une autre illustration de l’article.' },
+  { id: 'altart', label: 'Alternate Art', chance: 1 / 500, hit: 2, blurb: 'Illustration alternative, cadre orné.' },
   { id: 'gold', label: 'Gold', chance: 1 / 1250, hit: 3, blurb: 'Entièrement dorée.' },
   { id: 'rainbow', label: 'Rainbow', chance: 1 / 5000, hit: 3, blurb: 'Prisme arc-en-ciel galactique.' },
 ];
@@ -32,17 +32,14 @@ export const VARIANT_BY_ID: Record<VariantId, VariantInfo> = {
 
 /** Display order (rarest last). */
 export const VARIANT_ORDER: VariantId[] = [
-  'normal', 'reverse', 'holo', 'bw', 'inverted', 'etched', 'fullart', 'altart', 'signed', 'gold', 'rainbow',
+  'normal', 'reverse', 'holo', 'bw', 'neon', 'etched', 'fullart', 'altart', 'signed', 'gold', 'rainbow',
 ];
 
 export function rollVariant(card: CardData, rnd: () => number): VariantId {
   if (card.sig && rnd() < SIGNED_CHANCE) return 'signed';
   let x = rnd();
   for (const v of VARIANTS) {
-    if (x < v.chance) {
-      if (v.id === 'altart' && !card.alt) return 'normal';
-      return v.id;
-    }
+    if (x < v.chance) return v.id;
     x -= v.chance;
   }
   return 'normal';

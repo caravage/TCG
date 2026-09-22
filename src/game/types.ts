@@ -36,7 +36,7 @@ export type VariantId =
   | 'reverse'
   | 'holo'
   | 'bw'
-  | 'inverted'
+  | 'neon'
   | 'etched'
   | 'fullart'
   | 'altart'

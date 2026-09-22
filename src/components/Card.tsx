@@ -1,6 +1,5 @@
 import { useState, type CSSProperties } from 'react';
 import { RARITIES } from '../game/rarity';
-import { VARIANT_BY_ID } from '../game/variants';
 import type { CardData, Serial, VariantId } from '../game/types';
 import { useTilt } from './useTilt';
 
@@ -18,9 +17,11 @@ export interface CardProps {
 }
 
 const FULL_LAYOUT: VariantId[] = ['fullart', 'altart'];
-const ART_SHINE: VariantId[] = ['holo', 'inverted', 'signed', 'fullart', 'altart', 'rainbow'];
+const ART_SHINE: VariantId[] = ['holo', 'signed', 'fullart', 'altart', 'rainbow'];
 const FRAME_SHINE: VariantId[] = ['reverse', 'bw', 'etched', 'gold', 'rainbow'];
 const SPARKLES: VariantId[] = ['fullart', 'altart', 'signed', 'gold', 'rainbow'];
+const CORNERS: VariantId[] = ['gold', 'altart', 'signed'];
+const SWEEP: VariantId[] = ['gold', 'fullart', 'altart', 'etched'];
 
 export function Card({
   card,
@@ -36,12 +37,14 @@ export function Card({
   const ref = useTilt<HTMLDivElement>(interactive);
   const rarity = RARITIES[card.r];
   const oneOfOne = serial?.of === 1;
-  const img = variant === 'altart' && card.alt ? card.alt : card.img;
+  // Alternate art uses the article's second image, or a re-framed crop of the main one.
+  const sources = variant === 'altart' ? [card.alt, card.img] : [card.img];
   const classes = [
     'card',
     `r-${rarity.key}`,
     `v-${variant}`,
     FULL_LAYOUT.includes(variant) ? 'is-full' : '',
+    variant === 'altart' && !card.alt ? 'alt-crop' : '',
     serial ? 'is-numbered' : '',
     oneOfOne ? 'is-oneofone' : '',
     faceDown ? 'is-down' : '',
@@ -59,24 +62,25 @@ export function Card({
             {FRAME_SHINE.includes(variant) && <div className="fx fx--frameshine" />}
             <div className="card__layout">
               <div className="card__art">
-                <CardArt src={img} name={card.t} />
+                <CardArt sources={sources} name={card.t} />
                 {variant === 'signed' && card.sig && <img className="card__sig" src={card.sig} alt="" draggable={false} />}
                 {ART_SHINE.includes(variant) && <div className="fx fx--artshine" />}
               </div>
               <header className="card__head">
                 <span className="card__name">{card.t}</span>
-                <Pips rarity={card.r} />
+                <RarityBadge rarity={card.r} />
               </header>
               <div className="card__desc">{card.d}</div>
               <footer className="card__foot">
                 <span className="card__no">Nº {String(card.n).padStart(4, '0')}</span>
-                <span className="card__rarity">{rarity.label}</span>
-                {variant !== 'normal' && <span className="card__variant">{VARIANT_BY_ID[variant].label}</span>}
+                <span className="card__set">Historia · I</span>
               </footer>
             </div>
             {variant === 'etched' && <div className="fx fx--etch" />}
             {variant === 'rainbow' && <div className="fx fx--rainbow" />}
             {(SPARKLES.includes(variant) || oneOfOne) && <div className="fx fx--sparkle" />}
+            {(SWEEP.includes(variant) || oneOfOne) && <div className="fx fx--sweep" />}
+            {(CORNERS.includes(variant) || oneOfOne) && <div className="fx fx--corners" />}
             {serial && (
               <div className="card__serial">
                 {oneOfOne ? (
@@ -90,7 +94,7 @@ export function Card({
                 )}
               </div>
             )}
-            {variant === 'signed' && <div className="card__seal">Signée</div>}
+            {variant === 'signed' && <div className="card__seal">H</div>}
             <div className="fx fx--glare" />
           </div>
           <div className="card__face card__back">
@@ -102,24 +106,35 @@ export function Card({
   );
 }
 
-function CardArt({ src, name }: { src: string; name: string }) {
-  const [failed, setFailed] = useState(false);
-  if (failed || !src) {
+/** Tries each source in turn; shows a monogram only if every image fails. */
+function CardArt({ sources, name }: { sources: (string | undefined)[]; name: string }) {
+  const list = sources.filter((s): s is string => !!s);
+  const [idx, setIdx] = useState(0);
+  if (idx >= list.length) {
     return (
       <div className="card__fallback">
         <span>{name.charAt(0)}</span>
       </div>
     );
   }
-  return <img className="card__img" src={src} alt={name} loading="lazy" draggable={false} onError={() => setFailed(true)} />;
+  return (
+    <img
+      key={list[idx]}
+      className="card__img"
+      src={list[idx]}
+      alt={name}
+      loading="lazy"
+      draggable={false}
+      onError={() => setIdx((i) => i + 1)}
+    />
+  );
 }
 
-export function Pips({ rarity }: { rarity: number }) {
+export function RarityBadge({ rarity }: { rarity: number }) {
+  const r = RARITIES[rarity];
   return (
-    <span className="pips" aria-label={RARITIES[rarity].label}>
-      {Array.from({ length: rarity + 1 }, (_, i) => (
-        <i key={i} />
-      ))}
+    <span className={`rbadge rb-${r.key}`} title={r.label}>
+      {r.short}
     </span>
   );
 }
