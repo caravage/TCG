@@ -243,18 +243,39 @@ async function getViews(candidates) {
 // ---------------------------------------------------------------------------
 const ALT_IMAGE_PROPS = ['P6802', 'P2716', 'P158', 'P94', 'P41', 'P1442', 'P242'];
 
+// Occupations that alone do not make someone a historical figure (e.g. Elvis Presley has a
+// military rank). Such people are kept only with a position, a title or a history occupation.
+const EXCLUDED_OCCUPATIONS = new Set([
+  'Q177220', 'Q33999', 'Q10800557', 'Q10798782', 'Q2259451', 'Q639669', 'Q488205', 'Q2252262', 'Q937857',
+  'Q2066131', 'Q11338576', 'Q378622', 'Q484188', 'Q16266334', 'Q4610556', 'Q245068', 'Q3665646', 'Q10833314',
+  'Q2309784', 'Q2526255', 'Q3282637', 'Q753110', 'Q130857', 'Q855091',
+]);
+const HISTORY_OCCUPATIONS = new Set([
+  'Q82955', 'Q116', 'Q189290', 'Q47064', 'Q1402561', 'Q11900058', 'Q3242115', 'Q193391', 'Q372436', 'Q1097498',
+  'Q1397808', 'Q201788',
+]);
+
 const claimFiles = (claims, prop) =>
   (claims?.[prop] || [])
     .filter((c) => c.rank !== 'deprecated' && c.mainsnak?.datavalue?.value)
     .sort((a, b) => (b.rank === 'preferred') - (a.rank === 'preferred'))
     .map((c) => c.mainsnak.datavalue.value);
 
+function claimYear(claims, ...props) {
+  for (const p of props) {
+    const v = claimFiles(claims, p).find((x) => x?.time);
+    const m = v && /^([+-])(\d+)-/.exec(v.time);
+    if (m) return (m[1] === '-' ? -1 : 1) * Number(m[2]);
+  }
+  return null;
+}
+
 async function getEntities(ids) {
   console.log(`3. Wikidata entities for ${ids.length} items`);
   const out = new Map();
   await pool(chunks(ids, 50), 4, async (batch) => {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=descriptions|claims&languages=fr&ids=${batch.join('|')}`;
-    const json = await cached('entities', url, async () => {
+    const json = await cached('entities-v2', url, async () => {
       const res = await fetchRetry(url);
       const j = await res.json();
       // Only keep what we need, the full claims are huge.
@@ -265,6 +286,12 @@ async function getEntities(ids) {
           img: claimFiles(e.claims, 'P18'),
           sig: claimFiles(e.claims, 'P109')[0] || null,
           alt: ALT_IMAGE_PROPS.flatMap((p) => claimFiles(e.claims, p)),
+          occ: claimFiles(e.claims, 'P106').map((v) => v.id),
+          office: claimFiles(e.claims, 'P39').length + claimFiles(e.claims, 'P97').length > 0,
+          born: claimYear(e.claims, 'P569'),
+          died: claimYear(e.claims, 'P570'),
+          start: claimYear(e.claims, 'P580', 'P585', 'P571'),
+          end: claimYear(e.claims, 'P582', 'P576'),
         };
       }
       return slim;
@@ -336,9 +363,18 @@ async function main() {
   const period = await getViews(candidates);
 
   const ranked = candidates.filter((c) => c.views > 0).sort((a, b) => b.views - a.views);
-  const shortlist = ranked.slice(0, Math.ceil(TARGET * 1.15));
+  const pre = ranked.slice(0, Math.ceil(TARGET * 1.3));
 
-  const entities = await getEntities(shortlist.map((c) => c.id));
+  const entities = await getEntities(pre.map((c) => c.id));
+  const isOffTopic = (c) => {
+    const e = entities.get(c.id);
+    if (!e || c.kind !== 'person') return false;
+    if (e.office || e.occ.some((o) => HISTORY_OCCUPATIONS.has(o))) return false;
+    return e.occ.some((o) => EXCLUDED_OCCUPATIONS.has(o));
+  };
+  const offTopic = pre.filter(isOffTopic);
+  console.log(`  excluded ${offTopic.length} off-topic people: ${offTopic.slice(0, 15).map((c) => c.title).join(', ')}…`);
+  const shortlist = pre.filter((c) => !isOffTopic(c));
   const mainThumbs = await getThumbs(shortlist.map((c) => entities.get(c.id)?.img[0]), 500);
 
   const withImage = shortlist.filter((c) => mainThumbs.has(entities.get(c.id)?.img[0])).slice(0, TARGET);
@@ -364,6 +400,12 @@ async function main() {
       r: 0,
       url: `https://fr.wikipedia.org/wiki/${encodeURIComponent(c.title.replace(/ /g, '_'))}`,
     };
+    // Card orientation and dates for the timeline: people are portraits, events are landscapes.
+    card.k = c.kind === 'person' ? 'p' : 'e';
+    const y1 = c.kind === 'person' ? e.born : e.start;
+    const y2 = c.kind === 'person' ? e.died : e.end;
+    if (y1 != null) card.y1 = y1;
+    if (y2 != null && y2 !== y1) card.y2 = y2;
     const alt = altThumbs.get(altFiles[i]);
     if (alt) card.alt = alt;
     const sig = e.sig && sigThumbs.get(e.sig);
@@ -372,13 +414,14 @@ async function main() {
   });
   assignRarity(cards);
 
-  const out = { version: 1, generatedAt: new Date().toISOString(), period: `${period.start}-${period.end}`, cards };
+  const out = { version: 2, generatedAt: new Date().toISOString(), period: `${period.start}-${period.end}`, cards };
   writeFileSync('public/cards.json', JSON.stringify(out));
 
   const counts = [0, 1, 2, 3, 4, 5].map((r) => cards.filter((c) => c.r === r).length);
   console.log(`\nWrote public/cards.json — ${cards.length} cards`);
   console.log(`  by rarity (C→M): ${counts.join(' / ')}`);
   console.log(`  with signature: ${cards.filter((c) => c.sig).length}, with alternate art: ${cards.filter((c) => c.alt).length}`);
+  console.log(`  events (landscape): ${cards.filter((c) => c.k === 'e').length}, with dates: ${cards.filter((c) => c.y1 != null).length}`);
   console.log(`  top 10: ${cards.slice(0, 10).map((c) => `${c.t} (${c.views})`).join(', ')}`);
   console.log(`  bottom: ${cards.slice(-3).map((c) => `${c.t} (${c.views})`).join(', ')}`);
 }
