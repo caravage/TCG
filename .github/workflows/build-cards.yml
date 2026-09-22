@@ -1,0 +1,46 @@
+name: Build card set
+
+# Regenerates public/cards.json from Wikidata / Wikipedia and commits it.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Number of cards
+        default: '3000'
+  push:
+    paths:
+      - scripts/build-cards.mjs
+      - .github/workflows/build-cards.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-cards-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: wikimedia-${{ hashFiles('scripts/build-cards.mjs') }}-${{ github.run_id }}
+          restore-keys: wikimedia-
+      - name: Build cards
+        run: node scripts/build-cards.mjs --target "${{ github.event.inputs.target || '3000' }}"
+      - name: Commit cards.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/cards.json
+          if git diff --cached --quiet; then echo "No change"; exit 0; fi
+          git commit -m "data: regenerate cards.json"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
