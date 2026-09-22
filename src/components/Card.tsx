@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { formatDates, timelinePos } from '../game/dates';
+import { formatDates } from '../game/dates';
 import { RARITIES } from '../game/rarity';
 import type { CardData, Serial, VariantId } from '../game/types';
 import { useTilt } from './useTilt';
@@ -41,7 +41,9 @@ export function Card({
   const ref = useTilt<HTMLDivElement>(interactive);
   const rarity = RARITIES[card.r];
   const oneOfOne = serial?.of === 1;
-  const landscape = isLandscape(card);
+  // Landscape cards stay portrait while face down so the reveal keeps its surprise.
+  const landscape = isLandscape(card) && !faceDown;
+  const mask = card.m ? `url(${import.meta.env.BASE_URL}masks/${card.id}.png)` : undefined;
   const full = FULL_LAYOUT.includes(variant);
   // Alternate art uses the article's second image, or a re-framed crop of the main one.
   const sources = variant === 'altart' ? [card.alt, card.img] : [card.img];
@@ -61,6 +63,7 @@ export function Card({
   ].join(' ');
   const style = {
     '--w': `${width}px`,
+    ...(mask ? { '--mask': mask } : {}),
     width: landscape ? width * 1.4 : width,
     height: landscape ? width : width * 1.4,
   } as CSSProperties;
@@ -80,6 +83,13 @@ export function Card({
                     <img className="card__sig" src={card.sig} alt="" draggable={false} />
                   )}
                   {ART_SHINE.includes(variant) && <div className="fx fx--artshine" />}
+                  {variant === 'bgholo' && <div className="fx fx--bgholo" />}
+                  {variant === 'goldsil' && (
+                    <>
+                      <div className="fx fx--goldsil" />
+                      <div className="fx fx--goldsil-shine" />
+                    </>
+                  )}
                   {serial && (
                     <div className="card__serial">
                       {oneOfOne ? (
@@ -126,31 +136,13 @@ function nameSize(t: string): string {
   return '';
 }
 
-/** Mini timeline engraved in the plaque: where the card sits in history. */
+/** Dates and collector number under the description. */
 function Timeline({ card }: { card: CardData }) {
   const dates = formatDates(card);
-  const no = `Nº ${String(card.n).padStart(4, '0')}`;
-  const a = card.y1 ?? card.y2;
-  const b = card.y2 ?? card.y1;
   return (
-    <div className="card__time">
-      {a != null && b != null && (
-        <div className="tl">
-          <div className="tl__axis" />
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="tl__tick" style={{ left: `${i * 20}%` }} />
-          ))}
-          <div
-            className="tl__span"
-            style={{ left: `${timelinePos(a) * 100}%`, width: `${(timelinePos(b) - timelinePos(a)) * 100}%` }}
-          />
-          <div className="tl__dot" style={{ left: `${timelinePos(a) * 100}%` }} />
-        </div>
-      )}
-      <div className="card__meta">
-        <span>{dates ?? ''}</span>
-        <span>{no}</span>
-      </div>
+    <div className="card__meta">
+      <span>{dates ?? ''}</span>
+      <span>Nº {String(card.n).padStart(4, '0')}</span>
     </div>
   );
 }

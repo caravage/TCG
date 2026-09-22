@@ -8,6 +8,7 @@ export function Showcase({ cards }: { cards: CardData[] }) {
   const pick = (r: Rarity) => cards.find((c) => c.r === r && c.k !== 'e') ?? cards.find((c) => c.r === r) ?? cards[0];
   const withSig = cards.find((c) => c.sig) ?? cards[0];
   const withAlt = cards.find((c) => c.alt) ?? cards[0];
+  const withMask = cards.find((c) => c.m && c.r >= 3) ?? cards.find((c) => c.m) ?? cards[0];
   const hero = pick(4);
   const event = cards.find((c) => c.k === 'e' && c.r >= 3) ?? cards.find((c) => c.k === 'e');
 
@@ -30,7 +31,7 @@ export function Showcase({ cards }: { cards: CardData[] }) {
         <>
           <h2 className="showcase__h">Événements (cartes horizontales)</h2>
           <div className="grid">
-            {(['normal', 'holo', 'fullart', 'gold'] as const).map((v) => (
+            {(['normal', 'holo', 'fullart', 'rainbow'] as const).map((v) => (
               <div key={v} className="grid__item">
                 <Card card={event} variant={v} width={188} />
                 <div className="showcase__label">{VARIANT_BY_ID[v].label}</div>
@@ -43,7 +44,8 @@ export function Showcase({ cards }: { cards: CardData[] }) {
       <h2 className="showcase__h">Variantes</h2>
       <div className="grid">
         {VARIANT_ORDER.filter((v) => v !== 'normal').map((v) => {
-          const card = v === 'signed' ? withSig : v === 'altart' ? withAlt : hero;
+          const card =
+            v === 'signed' ? withSig : v === 'altart' ? withAlt : v === 'bgholo' || v === 'goldsil' ? withMask : hero;
           const info = VARIANT_BY_ID[v];
           return (
             <div key={v} className="grid__item">

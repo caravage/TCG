@@ -10,6 +10,7 @@ on:
   push:
     paths:
       - scripts/build-cards.mjs
+      - scripts/build-masks.py
       - .github/workflows/build-cards.yml
 
 permissions:
@@ -22,7 +23,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,12 +36,23 @@ jobs:
           restore-keys: wikimedia-
       - name: Build cards
         run: node scripts/build-cards.mjs --target "${{ github.event.inputs.target || '3000' }}"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.u2net
+          key: u2net-model-v1
+      - name: Build subject masks
+        run: |
+          pip install --quiet "rembg[cpu]" pillow
+          python scripts/build-masks.py
       - name: Commit cards.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/cards.json
+          git add public/cards.json public/masks
           if git diff --cached --quiet; then echo "No change"; exit 0; fi
-          git commit -m "data: regenerate cards.json"
+          git commit -m "data: regenerate cards.json and masks"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"

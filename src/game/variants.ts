@@ -18,8 +18,10 @@ export const VARIANTS: VariantInfo[] = [
   { id: 'bw', label: 'Noir & Blanc', chance: 0.015, hit: 1, blurb: 'Tirage argentique monochrome.' },
   { id: 'neon', label: 'Néon', chance: 0.01, hit: 1, blurb: 'Contours lumineux façon enseigne au néon.' },
   { id: 'etched', label: 'Foil gravé', chance: 0.008, hit: 1, blurb: 'Texture métallique gravée en relief.' },
+  { id: 'bgholo', label: 'Holo de fond', chance: 1 / 150, hit: 1, blurb: 'Le décor scintille, le personnage reste mat.' },
   { id: 'fullart', label: 'Full Art', chance: 1 / 250, hit: 2, blurb: 'L’illustration couvre toute la carte.' },
   { id: 'altart', label: 'Alternate Art', chance: 1 / 500, hit: 2, blurb: 'Illustration alternative, cadre orné.' },
+  { id: 'goldsil', label: 'Silhouette dorée', chance: 1 / 800, hit: 2, blurb: 'Le personnage est frappé à la feuille d’or.' },
   { id: 'gold', label: 'Gold', chance: 1 / 1250, hit: 3, blurb: 'Entièrement dorée.' },
   { id: 'rainbow', label: 'Rainbow', chance: 1 / 5000, hit: 3, blurb: 'Prisme arc-en-ciel galactique.' },
 ];
@@ -32,17 +34,29 @@ export const VARIANT_BY_ID: Record<VariantId, VariantInfo> = {
 
 /** Display order (rarest last). */
 export const VARIANT_ORDER: VariantId[] = [
-  'normal', 'reverse', 'holo', 'bw', 'neon', 'etched', 'fullart', 'altart', 'signed', 'gold', 'rainbow',
+  'normal', 'reverse', 'holo', 'bw', 'neon', 'etched', 'bgholo', 'fullart', 'altart', 'goldsil', 'signed', 'gold', 'rainbow',
 ];
 
 export function rollVariant(card: CardData, rnd: () => number): VariantId {
   if (card.sig && rnd() < SIGNED_CHANCE) return 'signed';
   let x = rnd();
   for (const v of VARIANTS) {
-    if (x < v.chance) return v.id;
+    if (x < v.chance) {
+      // Masked effects need a subject cut-out; no gold landscape cards.
+      if ((v.id === 'bgholo' || v.id === 'goldsil') && !card.m) return 'normal';
+      if (v.id === 'gold' && card.k === 'e') return 'normal';
+      return v.id;
+    }
     x -= v.chance;
   }
   return 'normal';
+}
+
+/** Signed cards are always numbered: 1/1 1 %, /10 9 %, /50 30 %, /100 60 %. */
+export function rollSignedSerial(rnd: () => number): Serial {
+  const x = rnd();
+  const of = x < 0.01 ? 1 : x < 0.1 ? 10 : x < 0.4 ? 50 : 100;
+  return { of, num: 1 + Math.floor(rnd() * of) };
 }
 
 /** Numbered prints, independent from the variant. Numbers are simulated (no server yet). */

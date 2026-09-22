@@ -72,10 +72,12 @@ commite le résultat. On peut la relancer à la main depuis l'onglet *Actions*.
 | Noir & Blanc | 1,5 % |
 | Néon | 1 % |
 | Foil gravé | 0,8 % |
+| Holo de fond | 1 / 150 (portraits avec masque : le décor scintille, pas le personnage) |
 | Full Art | 1 / 250 |
 | Alternate Art | 1 / 500 (2ᵉ image de l’article, sinon recadrage stylisé de la principale) |
-| Signée | 1 / 300 (seulement si la page a une signature) |
-| Gold | 1 / 1 250 |
+| Signée | 1 / 300 (seulement si la page a une signature ; toujours numérotée) |
+| Silhouette dorée | 1 / 800 (portraits avec masque : le personnage en feuille d’or) |
+| Gold | 1 / 1 250 (pas sur les cartes horizontales) |
 | Rainbow | 1 / 5 000 |
 
 ### Numérotées (cumulables avec une variante)

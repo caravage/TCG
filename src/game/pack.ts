@@ -1,5 +1,5 @@
 import { GOD_PACK_CHANCE, SLOT_ODDS, rollOdds } from './rarity';
-import { VARIANT_BY_ID, rollSerial, rollVariant, serialHit } from './variants';
+import { VARIANT_BY_ID, rollSerial, rollSignedSerial, rollVariant, serialHit } from './variants';
 import type { CardData, Pack, Pull, Rarity } from './types';
 
 export type Pools = CardData[][];
@@ -35,7 +35,7 @@ let uidCounter = 0;
 
 export function makePull(card: CardData, rnd: () => number): Pull {
   const variant = rollVariant(card, rnd);
-  const serial = rollSerial(rnd);
+  const serial = rollSerial(rnd) ?? (variant === 'signed' ? rollSignedSerial(rnd) : undefined);
   const hit = Math.max(rarityHit(card.r), VARIANT_BY_ID[variant].hit, serialHit(serial));
   return { uid: `${Date.now().toString(36)}-${(uidCounter++).toString(36)}`, card, variant, serial, hit };
 }

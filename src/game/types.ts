@@ -27,6 +27,8 @@ export interface CardData {
   y1?: number;
   /** Death / end year. */
   y2?: number;
+  /** 1 when public/masks/<id>.png (subject cut-out) exists. */
+  m?: 1;
 }
 
 export interface CardSet {
@@ -46,6 +48,8 @@ export type VariantId =
   | 'etched'
   | 'fullart'
   | 'altart'
+  | 'bgholo'
+  | 'goldsil'
   | 'signed'
   | 'gold'
   | 'rainbow';
