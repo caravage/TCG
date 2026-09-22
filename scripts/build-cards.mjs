@@ -250,6 +250,10 @@ const EXCLUDED_OCCUPATIONS = new Set([
   'Q2066131', 'Q11338576', 'Q378622', 'Q484188', 'Q16266334', 'Q4610556', 'Q245068', 'Q3665646', 'Q10833314',
   'Q2309784', 'Q2526255', 'Q3282637', 'Q753110', 'Q130857', 'Q855091',
 ]);
+// Hand-picked exclusions the rules above miss.
+const DENYLIST = new Set([
+  'Q303', // Elvis Presley
+]);
 const HISTORY_OCCUPATIONS = new Set([
   'Q82955', 'Q116', 'Q189290', 'Q1402561', 'Q11900058', 'Q3242115', 'Q193391', 'Q372436', 'Q1097498',
   'Q1397808', 'Q201788',
@@ -367,6 +371,7 @@ async function main() {
 
   const entities = await getEntities(pre.map((c) => c.id));
   const isOffTopic = (c) => {
+    if (DENYLIST.has(c.id)) return true;
     const e = entities.get(c.id);
     if (!e || c.kind !== 'person') return false;
     if (e.office || e.occ.some((o) => HISTORY_OCCUPATIONS.has(o))) return false;
