@@ -19,11 +19,11 @@ interface Props {
 
 type Phase = 'idle' | 'burst' | 'reveal' | 'summary';
 
-const RARITY_GLOW = ['#e1d8c2', '#ffcf97', '#8cc0ff', '#c89cff', '#ffd766', '#ffffff'];
+const RARITY_GLOW = ['#d9d5cb', '#2e9e6b', '#2f6fd6', '#8a4be0', '#e8741a', '#d6243a'];
 
 export function particleColors(p: Pull): string[] {
   if (p.variant === 'gold' || p.serial?.of === 1) return PALETTES.gold;
-  if (p.variant === 'rainbow' || p.card.r === 5) return PALETTES.mythic;
+  if (p.variant === 'rainbow') return ['#ff6b6b', '#ffd36b', '#7dff9b', '#6be4ff', '#8a7dff', '#ff7de9'];
   return PALETTES[RARITIES[p.card.r].key as keyof typeof PALETTES];
 }
 

@@ -84,122 +84,96 @@
   transform: rotateY(180deg);
 }
 
-/* ---------- default look, then the metal of frame and plaque per rarity ---------- */
+/* ---------- palette: one ink per rarity, off-white paper ---------- */
 .card {
-  --wood: linear-gradient(160deg, #2e231b, #15100c);
-  --metal: linear-gradient(160deg, #f1dfb0, #b08d4f 45%, #e3c98e 75%, #9c7a3e);
-  --ink: #1c140a;
-  --accent: #f1dfb0;
+  --paper: #f4f1e9;
+  --ink: #161513;
+  --muted: #6e6a62;
+  --faint: #9c978d;
+  --band: #0f0f11;
+  --rc: #2a2a2a;
+  --accent: var(--rc);
   --glow: transparent;
 }
-
 .card.r-common {
-  --metal: linear-gradient(160deg, #c2a582, #6d5238 55%, #a3825f);
-  --accent: #e1d0b4;
+  --rc: #2a2a2a;
 }
 .card.r-uncommon {
-  --metal: linear-gradient(160deg, #f0b890, #9a5430 50%, #d99064);
-  --accent: #ffcf97;
+  --rc: #2e9e6b;
 }
 .card.r-rare {
-  --metal: linear-gradient(160deg, #f6f8fb, #9aa7b8 50%, #e2e8ef);
-  --accent: #8cc0ff;
-  --glow: rgb(120 170 255 / 0.25);
+  --rc: #2f6fd6;
 }
 .card.r-epic {
-  --metal: linear-gradient(160deg, #eadbff, #8c64cf 50%, #cdb4f5);
-  --accent: #d6b4ff;
-  --glow: rgb(180 120 255 / 0.4);
+  --rc: #8a4be0;
 }
 .card.r-legendary {
-  --metal: linear-gradient(135deg, #fff0bf, #d9a52a 30%, #8a6212 55%, #f6d573 80%);
-  --wood: radial-gradient(120% 70% at 50% 0%, #332616, #110c07 70%);
-  --accent: #ffe38f;
-  --glow: rgb(255 205 90 / 0.5);
+  --rc: #e8741a;
 }
 .card.r-mythic {
-  --metal: linear-gradient(135deg, #ffe9a8, #c9971f 30%, #fff3c8 50%, #b8860b 75%, #ffe38f);
-  --wood: radial-gradient(120% 70% at 50% 0%, #25211c, #07060a 70%);
-  --accent: #fff;
-  --glow: rgb(255 215 120 / 0.45);
+  --rc: #d6243a;
 }
-.card.r-epic .card__front,
-.card.r-legendary .card__front,
-.card.r-mythic .card__front {
-  box-shadow:
-    0 calc(var(--w) * 0.02) calc(var(--w) * 0.06) rgb(0 0 0 / 0.55),
-    0 0 0 1px rgb(0 0 0 / 0.6),
-    0 0 calc(var(--w) * 0.12) var(--glow);
-}
-.card.r-mythic .card__frame {
-  background: conic-gradient(from 200deg, #ff8a8a, #ffe38a, #9dffb0, #8ae4ff, #b08aff, #ff9be9, #ff8a8a);
+/* Black would vanish on the dark band of landscape cards */
+.card.is-landscape.r-common {
+  --rc: #d9d5cb;
 }
 
 .card__bg {
   position: absolute;
   inset: 0;
-  background: var(--wood);
+  background: var(--paper);
 }
 .card__bg::after {
-  /* wood grain */
+  /* faint paper grain */
   content: '';
   position: absolute;
   inset: 0;
   background:
-    repeating-linear-gradient(92deg, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 4px),
-    radial-gradient(120% 80% at 50% 110%, rgb(0 0 0 / 0.35), transparent 60%);
+    radial-gradient(120% 90% at 50% 0%, rgb(255 255 255 / 0.5), transparent 60%),
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.012) 0 1px, transparent 1px 3px);
+  pointer-events: none;
 }
-/* Mythic: spinning prismatic ring around the card */
-.card.v-rainbow .card__bg::before {
-  content: '';
+.is-landscape .card__bg {
+  background: var(--band);
+}
+.is-landscape .card__bg::after {
+  display: none;
+}
+
+/* Thin rarity rule along the top of portrait cards */
+.card__line {
   position: absolute;
-  inset: 0;
-  padding: 1.4cqmin;
-  border-radius: inherit;
-  background: conic-gradient(from var(--angle), #ff6b6b, #ffd36b, #7dff9b, #6be4ff, #8a7dff, #ff7de9, #ff6b6b);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: spin-angle 4s linear infinite;
+  z-index: 3;
+  left: 4.4cqmin;
+  right: 4.4cqmin;
+  top: 2cqmin;
+  height: 0.9cqmin;
+  border-radius: 1cqmin;
+  background: var(--rc);
 }
-.card.v-rainbow .card__bg::before {
-  padding: 2.2cqmin;
-  animation-duration: 2.5s;
-}
-@keyframes spin-angle {
-  to {
-    --angle: 360deg;
-  }
+.is-landscape .card__line {
+  display: none;
 }
 
 /* ---------- layout ---------- */
 .card__layout {
   position: absolute;
-  inset: 5cqmin;
   z-index: 2;
   display: grid;
-  gap: 3.4cqmin;
 }
 .is-portrait .card__layout {
+  inset: 5.4cqmin 4.4cqmin 4.4cqmin;
   grid-template-rows: minmax(0, 1fr) auto;
+  gap: 3.6cqmin;
 }
 .is-landscape .card__layout {
-  grid-template-columns: minmax(0, 1fr) 44%;
+  inset: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 
-/* Frame: the painting's metal moulding */
 .card__frame {
   position: relative;
   min-height: 0;
-  padding: 3.2cqmin;
-  border-radius: 1.6cqmin;
-  background: var(--metal);
-  box-shadow:
-    inset 0 0 0 0.6cqmin rgb(0 0 0 / 0.3),
-    inset 0 0.6cqmin 0 rgb(255 255 255 / 0.35),
-    0 2cqmin 5cqmin rgb(0 0 0 / 0.5);
 }
 .card__art {
   position: relative;
@@ -207,20 +181,13 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border-radius: 0.8cqmin;
-  background: #111;
-  box-shadow: inset 0 0 0 1cqmin rgb(0 0 0 / 0.45);
+  border-radius: 1.4cqmin;
+  background: #d9d5cb;
 }
-.card__art::before {
-  /* inner bevel over the picture */
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 0.9cqmin rgb(0 0 0 / 0.35), inset 0 0 4cqmin rgb(0 0 0 / 0.35);
-  pointer-events: none;
+.is-landscape .card__art {
+  border-radius: 0;
 }
+
 .card__img,
 .card__fallback {
   position: absolute;
@@ -236,150 +203,185 @@
 .card__fallback {
   display: grid;
   place-items: center;
-  background:
-    radial-gradient(circle at 50% 35%, rgb(255 255 255 / 0.12), transparent 60%),
-    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.04) 0 2px, transparent 2px 9px),
-    linear-gradient(160deg, #2b2733, #15131b);
+  background: linear-gradient(160deg, #e6e2d8, #cfcabe);
 }
 .card__fallback span {
-  font-family: 'Cinzel', serif;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
   font-size: 30cqmin;
-  color: var(--accent);
-  opacity: 0.55;
+  color: var(--rc);
+  opacity: 0.4;
 }
 
-/* Plaque: brass label under (or beside) the painting */
+/* ---------- text ---------- */
 .card__plaque {
   position: relative;
   min-width: 0;
-  padding: 2.8cqmin 3.6cqmin 2.6cqmin;
-  border-radius: 1.2cqmin;
-  background: var(--metal);
   color: var(--ink);
-  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
-  box-shadow:
-    0 1.2cqmin 3cqmin rgb(0 0 0 / 0.45),
-    inset 0 0.4cqmin 0 rgb(255 255 255 / 0.5),
-    inset 0 -0.4cqmin 0 rgb(0 0 0 / 0.15);
+  font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
 }
-.is-landscape .card__plaque {
+.card__titlerow {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 4cqmin;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2.4cqmin;
 }
 .card__name {
-  font-weight: 800;
-  font-size: 5.6cqmin;
+  font-weight: 700;
+  font-size: 6cqmin;
   line-height: 1.12;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   overflow-wrap: anywhere;
   hyphens: auto;
 }
 .card__name.name--m {
-  font-size: 4.9cqmin;
+  font-size: 5.2cqmin;
 }
 .card__name.name--s {
-  font-size: 4.3cqmin;
+  font-size: 4.5cqmin;
 }
 .card__name.name--xs {
-  font-size: 3.8cqmin;
-}
-.is-landscape .card__name {
-  padding-right: 6cqmin;
+  font-size: 3.9cqmin;
 }
 .card__desc {
-  margin-top: 0.8cqmin;
-  font-weight: 500;
-  font-size: 3.8cqmin;
+  margin-top: 1cqmin;
+  font-size: 4.1cqmin;
   line-height: 1.3;
-  opacity: 0.85;
+  color: var(--muted);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: calc(3.8cqmin * 1.3 * 2);
 }
-.is-landscape .card__desc {
-  -webkit-line-clamp: 4;
-  min-height: 0;
-  margin-top: 1.6cqmin;
-}
-
 .card__meta {
   display: flex;
   justify-content: space-between;
   gap: 2cqmin;
-  margin-top: 1.8cqmin;
-  font-size: 2.8cqmin;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  opacity: 0.75;
+  margin-top: 2.4cqmin;
+  font-size: 2.9cqmin;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
   white-space: nowrap;
 }
 
-/* ---------- rarity badge (C, UC, R, UR, L, M) ---------- */
+/* ---------- landscape: Decision style ---------- */
+.is-landscape .card__plaque {
+  background: var(--band);
+  color: #fff;
+  padding: 3.6cqmin 5cqmin 3.8cqmin;
+}
+.is-landscape .card__plaque::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1.2cqmin;
+  background: var(--rc);
+}
+.is-landscape .card__name {
+  font-family: 'Archivo', 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 6cqmin;
+  line-height: 1.08;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+.is-landscape .card__desc {
+  color: rgb(255 255 255 / 0.62);
+  -webkit-line-clamp: 1;
+  margin-top: 0.8cqmin;
+}
+.is-landscape .card__meta {
+  color: rgb(255 255 255 / 0.45);
+  margin-top: 1.6cqmin;
+}
+.card__top {
+  position: absolute;
+  z-index: 5;
+  top: 3.4cqmin;
+  left: 4.4cqmin;
+  right: 4.4cqmin;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card__brand {
+  font-family: 'Archivo', 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 3cqmin;
+  letter-spacing: 0.3em;
+  color: #fff;
+  text-shadow: 0 0.3cqmin 1.2cqmin rgb(0 0 0 / 0.7);
+}
+
+/* ---------- rarity letter: a highlight runs across it as the card moves ---------- */
+.rmark {
+  flex: none;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 5.4cqmin;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.rmark__txt {
+  background: linear-gradient(
+    105deg,
+    var(--rc) 0%,
+    var(--rc) 36%,
+    color-mix(in srgb, #fff calc(40% + var(--hov) * 60%), var(--rc)) 50%,
+    var(--rc) 64%,
+    var(--rc) 100%
+  );
+  background-size: 320% 100%;
+  background-position: calc(100% - var(--px) * 100%) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 calc(var(--hov) * 1.4cqmin) color-mix(in srgb, var(--rc) 70%, transparent));
+}
+.rmark--chip {
+  font-family: 'Archivo', 'DM Sans', sans-serif;
+  font-size: 3.6cqmin;
+  padding: 1cqmin 2.6cqmin;
+  border-radius: 99px;
+  border: 0.5cqmin solid var(--rc);
+  background: rgb(14 14 16 / 0.6);
+}
+
+/* ---------- rarity pill used by the UI (binder, sheet) ---------- */
 .rbadge {
   flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+  font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
   font-weight: 800;
-  font-size: 3.4cqmin;
   line-height: 1;
   letter-spacing: 0.03em;
-  padding: 1cqmin 1.9cqmin;
-  border-radius: 99px;
-  box-shadow: 0 0.6cqmin 1.6cqmin rgb(0 0 0 / 0.55), inset 0 0 0 0.3cqmin rgb(255 255 255 / 0.4);
-}
-.card__badge {
-  position: absolute;
-  z-index: 11;
-  top: 2.6cqmin;
-  right: 2.6cqmin;
-  box-shadow: 0 0.6cqmin 1.6cqmin rgb(0 0 0 / 0.6), 0 0 0 0.7cqmin #15100c;
-}
-.rbadge--gem {
-  width: 8.4cqmin;
-  height: 8.4cqmin;
-  padding: 0;
-  border-radius: 0.8cqmin;
-  transform: rotate(45deg);
-}
-.rbadge--gem > span {
-  transform: rotate(-45deg);
-}
-.card__badge.rbadge--gem {
-  top: 3.6cqmin;
-  right: 3.6cqmin;
+  color: #fff;
 }
 .rb-common {
-  background: linear-gradient(160deg, #e9dcc6, #a88a66);
-  color: #2b1f12;
+  background: #2a2a2a;
 }
 .rb-uncommon {
-  background: linear-gradient(160deg, #ffd9bb, #c0703f);
-  color: #2e1408;
+  background: #2e9e6b;
 }
 .rb-rare {
-  background: linear-gradient(160deg, #f4f8ff, #8fb6e8);
-  color: #0f1e38;
+  background: #2f6fd6;
 }
 .rb-epic {
-  background: linear-gradient(160deg, #f0e2ff, #a070e0);
-  color: #1c0a3a;
+  background: #8a4be0;
 }
 .rb-legendary {
-  background: linear-gradient(160deg, #fff6cf, #e0a82a 60%, #b8860b);
-  color: #3a2603;
+  background: #e8741a;
 }
 .rb-mythic {
-  background: linear-gradient(90deg, #ff8a8a, #ffe38a, #9dffb0, #8ae4ff, #b08aff, #ff9be9, #ff8a8a);
-  background-size: 200% 100%;
-  animation: shimmer 3s linear infinite;
-  color: #1a1030;
+  background: #d6243a;
 }
+
 
 /* ---------- effects layers ---------- */
 .fx {
@@ -490,27 +492,7 @@
 /* =========================================================================
    VARIANTS
    ========================================================================= */
-
-/* Variant frames draw on .card__bg::before; reset what the mythic ring sets there. */
-.card.v-bw .card__bg::before,
-.card.v-neon .card__bg::before,
-.card.v-etched .card__bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  padding: 0;
-  -webkit-mask: none;
-  mask: none;
-  animation: none;
-  border-radius: inherit;
-  background: none;
-}
-
-/* Shine layered on the metal (frame + plaque), under the picture */
-.v-reverse .card__frame::after,
-.v-reverse .card__plaque::after,
-.v-etched .card__frame::after,
-.v-etched .card__plaque::after {
+.card__bg::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -518,23 +500,32 @@
   pointer-events: none;
 }
 
-/* Reverse holo: the metal becomes holographic, the picture stays clean */
-.v-reverse .card__frame::after,
-.v-reverse .card__plaque::after {
+/* Reverse holo: the paper itself is holographic, the picture stays clean */
+.v-reverse .card__bg::before {
+  z-index: 1;
   background-image:
     var(--holo),
-    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.18) 0 0.5cqmin, transparent 0.5cqmin 2cqmin);
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.25) 0 0.5cqmin, transparent 0.5cqmin 2cqmin);
   background-size: 420% 420%, 100% 100%;
   background-position: calc(var(--px) * 100%) calc(var(--py) * 100%), center;
+  mix-blend-mode: multiply;
+  opacity: calc(0.35 + var(--hov) * 0.3);
+}
+.is-landscape.v-reverse .card__plaque::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--holo);
+  background-size: 420% 420%;
+  background-position: calc(var(--px) * 100%) calc(var(--py) * 100%);
   mix-blend-mode: color-dodge;
-  filter: brightness(0.75) contrast(1.3);
-  opacity: calc(0.55 + var(--hov) * 0.45);
+  opacity: calc(0.35 + var(--hov) * 0.4);
+  pointer-events: none;
 }
 
 /* Holo: iridescent rim around the art */
-.v-holo .card__frame {
+.v-holo .card__art {
   box-shadow:
-    inset 0 0 0 0.6cqmin rgb(0 0 0 / 0.3),
     0 0 0 0.8cqmin #fff,
     0 0 4cqmin rgb(150 210 255 / 0.8);
   animation: hue-spin 3s linear infinite;
@@ -553,28 +544,27 @@
   }
 }
 
-/* Black & white: polished black marble with platinum metal */
+/* Black & white: polished black marble, silver type */
 .card.v-bw {
-  --wood: radial-gradient(120% 90% at 30% 10%, #2a2a2e, #0b0b0d 70%);
-  --metal: linear-gradient(160deg, #f4f5f7, #9ea3ab 45%, #e6e8ec 75%, #7d828a);
-  --accent: #e6e8ec;
+  --paper: #0d0d0f;
+  --band: #0d0d0f;
+  --ink: #f2f2f4;
+  --muted: #b3b5bb;
+  --faint: #83868d;
 }
 .v-bw .card__img {
   filter: grayscale(1) contrast(1.15) brightness(1.03);
 }
-.card.v-bw {
-  --marble: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='560'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.007 0.013' numOctaves='5' seed='19'/%3E%3CfeColorMatrix type='matrix' values='0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3CfeFuncG type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3CfeFuncB type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
-}
 .card.v-bw .card__bg::before {
-  background: var(--marble) center / cover;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='560'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.007 0.013' numOctaves='5' seed='19'/%3E%3CfeColorMatrix type='matrix' values='0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3CfeFuncG type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3CfeFuncB type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E") center / cover;
   mix-blend-mode: screen;
   opacity: 0.6;
 }
-.v-bw .card__plaque {
-  --ink: #eef0f3;
-  background: var(--marble) 30% 70% / 260% auto, radial-gradient(120% 120% at 20% 0%, #26262b, #0c0c0e);
-  background-blend-mode: screen;
-  box-shadow: inset 0 0 0 0.5cqmin #c9ccd2, 0 1.2cqmin 3cqmin rgb(0 0 0 / 0.5);
+.v-bw .card__bg::after {
+  display: none;
+}
+.v-bw .card__line {
+  background: linear-gradient(90deg, #8d9098, #f4f5f7, #8d9098);
 }
 .v-bw .card__name {
   background: linear-gradient(180deg, #ffffff, #b9bdc4);
@@ -582,19 +572,24 @@
   background-clip: text;
   color: transparent;
 }
-.v-bw .fx--frameshine {
-  --holo: repeating-linear-gradient(115deg, #555 0%, #fff 8%, #888 16%, #eee 24%, #555 32%);
-  mix-blend-mode: overlay;
-  filter: none;
+.v-bw .card__art {
+  box-shadow: 0 0 0 0.5cqmin #c9ccd2;
+}
+.is-landscape.v-bw .card__plaque {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='560'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.007 0.013' numOctaves='5' seed='19'/%3E%3CfeColorMatrix type='matrix' values='0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3CfeFuncG type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3CfeFuncB type='table' tableValues='1 0.25 0 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E") 30% 70% / 200% auto, #0d0d0f;
+  background-blend-mode: screen;
 }
 
 /* Neon: dark card, duotone picture, glowing tubes */
 .card.v-neon {
-  --wood: radial-gradient(120% 90% at 50% 20%, #1a1030, #07060d 70%);
-  --metal: linear-gradient(160deg, #1b1330, #0b0716);
+  --paper: radial-gradient(120% 90% at 50% 20%, #1a1030, #07060d 70%);
+  --band: #0b0716;
   --ink: #f4ecff;
-  --accent: #ff4fd8;
-  --line: rgb(124 244 255 / 0.5);
+  --muted: #cdb9ff;
+  --faint: #7cf4ff;
+}
+.v-neon .card__bg::after {
+  display: none;
 }
 .card.v-neon .card__bg::before {
   inset: 1.6cqmin;
@@ -607,7 +602,10 @@
     inset 0 0 3cqmin rgb(0 229 255 / 0.5);
   animation: neon-flicker 5s infinite;
 }
-.v-neon .card__frame {
+.v-neon .card__line {
+  display: none;
+}
+.v-neon .card__art {
   box-shadow:
     0 0 0 0.5cqmin #ff4fd8,
     0 0 2.5cqmin #ff4fd8,
@@ -623,18 +621,12 @@
   background: linear-gradient(160deg, #ff2bd6, #5b2bff 55%, #00e5ff);
   mix-blend-mode: color;
 }
-.v-neon .card__plaque {
-  box-shadow: inset 0 0 0 0.35cqmin #7cf4ff, 0 0 2.5cqmin rgb(0 229 255 / 0.55);
-}
 .v-neon .card__name {
   color: #fff;
   text-shadow:
     0 0 0.8cqmin #fff,
     0 0 2.5cqmin #ff4fd8,
     0 0 5cqmin #ff4fd8;
-}
-.v-neon .card__meta {
-  color: #7cf4ff;
 }
 @keyframes neon-flicker {
   0%, 18%, 20%, 22%, 62%, 64%, 100% {
@@ -645,16 +637,14 @@
   }
 }
 
-/* Etched foil: engraved guilloche on the metal */
+/* Etched foil: engraved guilloche over the paper */
 .v-etched {
   --holo: repeating-linear-gradient(115deg, #7a7f8c 0%, #f4f6ff 5%, #9aa0b2 10%, #fff7d6 15%, #7a7f8c 20%);
 }
-.v-etched .card__frame::after,
-.v-etched .card__plaque::after {
+.v-etched .card__bg::before {
   background:
-    repeating-radial-gradient(circle at 50% 50%, rgb(255 255 255 / 0.25) 0 0.25cqmin, transparent 0.25cqmin 1.1cqmin),
-    repeating-conic-gradient(from 0deg at 50% 50%, rgb(0 0 0 / 0.16) 0 2deg, transparent 2deg 5deg);
-  mix-blend-mode: overlay;
+    repeating-radial-gradient(circle at 50% 50%, rgb(0 0 0 / 0.08) 0 0.25cqmin, transparent 0.25cqmin 1.1cqmin),
+    repeating-conic-gradient(from 0deg at 50% 50%, rgb(0 0 0 / 0.07) 0 2deg, transparent 2deg 5deg);
 }
 .v-etched .fx--frameshine {
   mix-blend-mode: soft-light;
@@ -675,47 +665,56 @@
   opacity: 0.7;
 }
 
-/* Full art & alternate art (épuré): edge-to-edge picture, glass plaque */
+/* Full art & alternate art: edge-to-edge picture, glass plaque */
 .card.is-full .card__layout {
-  grid-template-columns: minmax(0, 1fr);
+  inset: 4.4cqmin;
   grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0;
 }
 .card.is-full .card__frame {
   position: absolute;
-  inset: -5cqmin;
-  padding: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
+  inset: -4.4cqmin;
 }
 .card.is-full .card__art {
   border-radius: 0;
+  box-shadow: none;
 }
 .card.is-full .card__art::before {
-  box-shadow: none;
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   background: linear-gradient(180deg, rgb(0 0 0 / 0) 45%, rgb(8 8 12 / 0.85) 88%);
+  pointer-events: none;
 }
 .card.is-full .card__plaque {
   grid-row: 2;
   z-index: 2;
   color: #fff;
+  padding: 3cqmin 3.6cqmin;
+  border-radius: 1.6cqmin;
   background: rgb(255 255 255 / 0.1);
   backdrop-filter: blur(6px);
-  box-shadow: inset 0 0 0 0.3cqmin rgb(255 255 255 / 0.28), 0 1.2cqmin 3cqmin rgb(0 0 0 / 0.35);
+  box-shadow: inset 0 0 0 0.3cqmin rgb(255 255 255 / 0.28);
+}
+.card.is-full .card__plaque::before {
+  display: none;
+}
+.card.is-full .card__desc {
+  color: rgb(255 255 255 / 0.75);
+}
+.card.is-full .card__meta {
+  color: rgb(255 255 255 / 0.55);
 }
 .is-landscape.is-full .card__plaque {
   width: 58%;
-  padding: 2.8cqmin 3.6cqmin;
-}
-.is-landscape.is-full .card__desc {
-  -webkit-line-clamp: 2;
 }
 .card.is-full .card__front::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1.2cqmin transparent, inset 0 0 0 1.6cqmin rgb(255 255 255 / 0.5);
+  box-shadow: inset 0 0 0 1.2cqmin transparent, inset 0 0 0 1.6cqmin color-mix(in srgb, var(--rc) 70%, #fff);
   z-index: 6;
   pointer-events: none;
 }
@@ -735,20 +734,10 @@
 }
 .v-altart .card__front::after {
   box-shadow:
-    inset 0 0 0 0.8cqmin var(--accent),
+    inset 0 0 0 0.8cqmin var(--rc),
     inset 0 0 0 1.4cqmin rgb(0 0 0 / 0.55),
-    inset 0 0 0 1.8cqmin var(--accent),
+    inset 0 0 0 1.8cqmin var(--rc),
     inset 0 0 5cqmin rgb(0 0 0 / 0.5);
-}
-.v-altart .card__art::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.06) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 3px);
-  mix-blend-mode: soft-light;
 }
 
 /* Signed */
@@ -764,25 +753,28 @@
     drop-shadow(0 0 2px rgb(0 0 0 / 0.9)) drop-shadow(0 0 6px rgb(255 200 80 / 0.7));
   transform: rotate(-6deg);
 }
-.v-signed .card__frame {
+.v-signed .card__art {
   box-shadow:
-    inset 0 0 0 0.6cqmin rgb(0 0 0 / 0.3),
     0 0 0 0.6cqmin #d9b45a,
-    0 0 0 1.2cqmin rgb(0 0 0 / 0.5),
+    0 0 0 1.2cqmin var(--paper),
     0 0 0 1.5cqmin #d9b45a;
 }
 .v-signed .fx--corners {
-  --c: #d9b45a;
+  --c: #c9a24a;
 }
 
-/* Gold: everything gold */
+/* Gold: gold leaf paper */
 .card.v-gold {
-  --metal: linear-gradient(135deg, #fff6c9, #e6b632 22%, #8f6410 45%, #ffe07a 65%, #b8860b 85%, #fff2b0);
-  --wood: linear-gradient(160deg, #5a3f06, #2e1f02);
-  --accent: #fff0b0;
+  --paper: linear-gradient(135deg, #fff3c4, #e6b632 25%, #a87a18 50%, #f6d573 75%, #c99a1e);
+  --ink: #2a1c02;
+  --muted: #4a3408;
+  --faint: #5c430f;
+  --rc: #2a1c02;
   --glow: rgb(255 210 90 / 0.65);
-  --line: rgb(255 240 176 / 0.8);
   --holo: repeating-linear-gradient(115deg, #7a5a10 0%, #fff4c0 6%, #c89520 12%, #fffbe6 18%, #7a5a10 24%);
+}
+.v-gold .card__line {
+  background: #2a1c02;
 }
 .v-gold .card__img {
   filter: sepia(1) saturate(2.3) hue-rotate(-10deg) brightness(1.06) contrast(1.08);
@@ -796,15 +788,29 @@
   box-shadow: 0 calc(var(--w) * 0.02) calc(var(--w) * 0.06) rgb(0 0 0 / 0.55), 0 0 calc(var(--w) * 0.14) var(--glow);
 }
 .v-gold .fx--corners {
-  --c: #fff0b0;
+  --c: #2a1c02;
 }
 
-/* Rainbow: prismatic metal and a spinning rainbow border */
+/* Rainbow: prismatic paper and a spinning rainbow border */
 .card.v-rainbow {
-  --metal: linear-gradient(135deg, #ffc2c2, #ffeab0, #caffbd, #b6f5ff, #c6c1ff, #ffcdf5);
-  --wood: linear-gradient(160deg, #1d1530, #0d0a18);
-  --accent: #fff;
+  --paper: linear-gradient(135deg, #ffe1e1, #fff3d1, #e2ffd9, #d9f8ff, #e3e0ff, #ffe3f8);
   --glow: rgb(200 170 255 / 0.7);
+}
+.card.v-rainbow .card__bg::before {
+  z-index: 1;
+  padding: 2.2cqmin;
+  background: conic-gradient(from var(--angle), #ff6b6b, #ffd36b, #7dff9b, #6be4ff, #8a7dff, #ff7de9, #ff6b6b);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin-angle 2.5s linear infinite;
+}
+@keyframes spin-angle {
+  to {
+    --angle: 360deg;
+  }
 }
 .v-rainbow .card__img {
   filter: saturate(1.4) contrast(1.05);
@@ -822,15 +828,16 @@
     #ff5f6d
   );
   mix-blend-mode: color;
-  opacity: 0.3;
+  opacity: 0.25;
 }
 .v-rainbow .fx--frameshine {
   z-index: 7;
-  opacity: calc(0.4 + var(--hov) * 0.45);
+  opacity: calc(0.35 + var(--hov) * 0.45);
 }
 .v-rainbow .fx--sparkle {
   background-size: 17px 23px, 31px 29px, 47px 41px;
 }
+
 
 /* Masked effects: public/masks/<id>.png holds the subject cut-out (alpha). The mask is
    laid out exactly like the <img> (cover, same focal point). */

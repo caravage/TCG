@@ -74,6 +74,7 @@ export function Card({
         <div className="card__flipper">
           <div className="card__face card__front">
             <div className="card__bg" />
+            <div className="card__line" />
             {FRAME_SHINE.includes(variant) && <div className="fx fx--frameshine" />}
             <div className="card__layout">
               <div className="card__frame">
@@ -89,6 +90,12 @@ export function Card({
                       <div className="fx fx--goldsil" />
                       <div className="fx fx--goldsil-shine" />
                     </>
+                  )}
+                  {landscape && (
+                    <div className="card__top">
+                      <span className="card__brand">HISTORIA</span>
+                      <RarityMark rarity={card.r} chip />
+                    </div>
                   )}
                   {serial && (
                     <div className="card__serial">
@@ -106,7 +113,10 @@ export function Card({
                 </div>
               </div>
               <div className="card__plaque">
-                <div className={`card__name ${nameSize(card.t)}`}>{card.t}</div>
+                <div className="card__titlerow">
+                  <div className={`card__name ${nameSize(card.t)}`}>{card.t}</div>
+                  {!landscape && <RarityMark rarity={card.r} />}
+                </div>
                 <div className="card__desc">{card.d}</div>
                 <Timeline card={card} />
               </div>
@@ -116,7 +126,6 @@ export function Card({
             {(SPARKLES.includes(variant) || oneOfOne) && <div className="fx fx--sparkle" />}
             {(SWEEP.includes(variant) || oneOfOne) && <div className="fx fx--sweep" />}
             {(CORNERS.includes(variant) || oneOfOne) && <div className="fx fx--corners" />}
-            <RarityBadge rarity={card.r} className="card__badge" />
             <div className="fx fx--glare" />
           </div>
           <div className="card__face card__back">
@@ -168,6 +177,16 @@ function CardArt({ sources, name }: { sources: (string | undefined)[]; name: str
       draggable={false}
       onError={() => setIdx((i) => i + 1)}
     />
+  );
+}
+
+/** The rarity letter printed on the card; a highlight runs across it as the card tilts. */
+function RarityMark({ rarity, chip = false }: { rarity: number; chip?: boolean }) {
+  const r = RARITIES[rarity];
+  return (
+    <span className={`rmark ${chip ? 'rmark--chip' : ''}`} title={r.label}>
+      <span className="rmark__txt">{r.short}</span>
+    </span>
   );
 }
 

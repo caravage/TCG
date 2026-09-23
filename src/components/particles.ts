@@ -41,12 +41,12 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
 
 export const PALETTES = {
-  common: ['#e1d8c2', '#ffffff'],
-  uncommon: ['#ffcf97', '#ffe7c9', '#ffffff'],
-  rare: ['#8cc0ff', '#d4e6ff', '#ffffff'],
-  epic: ['#c89cff', '#e8d6ff', '#8f5bff', '#ffffff'],
-  legendary: ['#ffd766', '#fff1b8', '#ffb300', '#ffffff'],
-  mythic: ['#ff6b6b', '#ffd36b', '#7dff9b', '#6be4ff', '#8a7dff', '#ff7de9', '#ffffff'],
+  common: ['#d9d5cb', '#ffffff'],
+  uncommon: ['#2e9e6b', '#8fe0b8', '#ffffff'],
+  rare: ['#2f6fd6', '#9cc0ff', '#ffffff'],
+  epic: ['#8a4be0', '#cbb0ff', '#ffffff'],
+  legendary: ['#e8741a', '#ffc08a', '#ffe0b8', '#ffffff'],
+  mythic: ['#d6243a', '#ff7a8a', '#ffd0d6', '#ffffff', '#ffd36b'],
   gold: ['#ffd766', '#fff1b8', '#e0a800', '#fffbe6'],
 };
 

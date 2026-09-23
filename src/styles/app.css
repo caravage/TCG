@@ -407,12 +407,12 @@ select {
   background: var(--accent);
   box-shadow: 0 0 10px var(--accent);
 }
-.rarity-bar.r-common { --accent: #e1d8c2; }
-.rarity-bar.r-uncommon { --accent: #ffcf97; }
-.rarity-bar.r-rare { --accent: #8cc0ff; }
-.rarity-bar.r-epic { --accent: #c89cff; }
-.rarity-bar.r-legendary { --accent: #ffd766; }
-.rarity-bar.r-mythic { --accent: #ff9be9; }
+.rarity-bar.r-common { --accent: #9a968c; }
+.rarity-bar.r-uncommon { --accent: #2e9e6b; }
+.rarity-bar.r-rare { --accent: #2f6fd6; }
+.rarity-bar.r-epic { --accent: #8a4be0; }
+.rarity-bar.r-legendary { --accent: #e8741a; }
+.rarity-bar.r-mythic { --accent: #d6243a; }
 
 .filters {
   display: flex;
@@ -491,12 +491,12 @@ select {
   font-family: 'Cinzel', serif;
   font-size: 44px;
 }
-.grid__missing.r-common { --accent: #e1d8c2; }
-.grid__missing.r-uncommon { --accent: #ffcf97; }
-.grid__missing.r-rare { --accent: #8cc0ff; }
-.grid__missing.r-epic { --accent: #c89cff; }
-.grid__missing.r-legendary { --accent: #ffd766; }
-.grid__missing.r-mythic { --accent: #ff9be9; }
+.grid__missing.r-common { --accent: #9a968c; }
+.grid__missing.r-uncommon { --accent: #2e9e6b; }
+.grid__missing.r-rare { --accent: #2f6fd6; }
+.grid__missing.r-epic { --accent: #8a4be0; }
+.grid__missing.r-legendary { --accent: #e8741a; }
+.grid__missing.r-mythic { --accent: #d6243a; }
 
 /* ---------- modal ---------- */
 .modal {
