@@ -29,13 +29,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
         with:
           path: .cache
-          key: wikimedia-${{ hashFiles('scripts/build-cards.mjs') }}-${{ github.run_id }}
+          key: wikimedia-${{ github.run_id }}
           restore-keys: wikimedia-
       - name: Build cards
         run: node scripts/build-cards.mjs --target "${{ github.event.inputs.target || '3000' }}"
+      # Keep what was downloaded even if the build fails (e.g. rate limited), so a rerun resumes.
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: .cache
+          key: wikimedia-${{ github.run_id }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

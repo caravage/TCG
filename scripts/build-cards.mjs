@@ -45,8 +45,8 @@ mkdirSync(CACHE, { recursive: true });
 // ---------------------------------------------------------------------------
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function fetchRetry(url, init = {}, { tries = 6, okStatuses = [] } = {}) {
-  let wait = 2000;
+async function fetchRetry(url, init = {}, { tries = 10, okStatuses = [] } = {}) {
+  let wait = 3000;
   for (let i = 1; ; i++) {
     try {
       const res = await fetch(url, { ...init, headers: { 'User-Agent': UA, 'Api-User-Agent': UA, ...(init.headers || {}) } });
@@ -60,7 +60,7 @@ async function fetchRetry(url, init = {}, { tries = 6, okStatuses = [] } = {}) {
       if (i >= tries) throw e;
       await sleep(wait);
     }
-    wait *= 2;
+    wait = Math.min(wait * 2, 90_000);
   }
 }
 
@@ -232,10 +232,31 @@ function median(xs) {
   return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2);
 }
 
+/** Last-12-months views for every candidate: a cheap first ranking. */
+async function getRecentViews(candidates, start, end) {
+  console.log(`2a. Recent page views for ${candidates.length} articles`);
+  const views = await pool(candidates, 6, async (c) => {
+    const title = encodeURIComponent(c.title.replace(/ /g, '_'));
+    const url = `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/fr.wikipedia.org/all-access/user/${title}/monthly/${start}/${end}`;
+    return cached('views', url, async () => {
+      const res = await fetchRetry(url, {}, { okStatuses: [404] });
+      if (res.status === 404) return 0;
+      const json = await res.json();
+      return json.items.reduce((s, it) => s + it.views, 0);
+    });
+  });
+  candidates.forEach((c, i) => (c.views12 = views[i]));
+}
+
 async function getViews(candidates) {
   const { start, end, lastYearFrom } = viewsPeriod();
-  console.log(`2. Page views ${start} → ${end} (median of yearly totals) for ${candidates.length} articles`);
-  const series = await pool(candidates, 24, async (c) => {
+  const f = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
+  await getRecentViews(candidates, f(lastYearFrom), end);
+
+  // The full history is only needed for articles that can plausibly make the cut.
+  const pool_ = [...candidates].sort((a, b) => b.views12 - a.views12).slice(0, Math.ceil(TARGET * 1.6));
+  console.log(`2b. Yearly page views ${start} → ${end} (median) for ${pool_.length} articles`);
+  const series = await pool(pool_, 6, async (c) => {
     const title = encodeURIComponent(c.title.replace(/ /g, '_'));
     const url = `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/fr.wikipedia.org/all-access/user/${title}/monthly/${start}/${end}`;
     return cached('views-monthly', url, async () => {
@@ -245,19 +266,17 @@ async function getViews(candidates) {
       return json.items.map((it) => [it.timestamp.slice(0, 6), it.views]);
     });
   });
-  candidates.forEach((c, i) => {
+  for (const c of candidates) c.views = 0;
+  pool_.forEach((c, i) => {
     const byYear = new Map(); // year → [total, months with data]
-    let last12 = 0;
     for (const [ym, v] of series[i]) {
       const y = Number(ym.slice(0, 4));
       const [t, n] = byYear.get(y) || [0, 0];
       byYear.set(y, [t + v, n + 1]);
-      if (new Date(Date.UTC(y, Number(ym.slice(4, 6)) - 1, 1)) >= lastYearFrom) last12 += v;
     }
     // Only complete years count (the article existed all year), plus the last 12 months.
     const full = [...byYear.values()].filter(([, n]) => n === 12).map(([t]) => t);
-    c.views12 = last12;
-    c.views = median([...full, last12]);
+    c.views = median([...full, c.views12]);
   });
   return { start, end };
 }
