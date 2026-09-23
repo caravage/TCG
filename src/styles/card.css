@@ -113,10 +113,6 @@
 .card.r-mythic {
   --rc: #d6243a;
 }
-/* Black would vanish on the dark band of landscape cards */
-.card.is-landscape.r-common {
-  --rc: #d9d5cb;
-}
 
 .card__bg {
   position: absolute;
@@ -133,12 +129,6 @@
     repeating-linear-gradient(0deg, rgb(0 0 0 / 0.012) 0 1px, transparent 1px 3px);
   pointer-events: none;
 }
-.is-landscape .card__bg {
-  background: var(--band);
-}
-.is-landscape .card__bg::after {
-  display: none;
-}
 
 /* Thin rarity rule along the top of portrait cards */
 .card__line {
@@ -151,9 +141,6 @@
   border-radius: 1cqmin;
   background: var(--rc);
 }
-.is-landscape .card__line {
-  display: none;
-}
 
 /* ---------- layout ---------- */
 .card__layout {
@@ -161,14 +148,10 @@
   z-index: 2;
   display: grid;
 }
-.is-portrait .card__layout {
+.card__layout {
   inset: 5.4cqmin 4.4cqmin 4.4cqmin;
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 3.6cqmin;
-}
-.is-landscape .card__layout {
-  inset: 0;
-  grid-template-rows: minmax(0, 1fr) auto;
 }
 
 .card__frame {
@@ -183,9 +166,6 @@
   overflow: hidden;
   border-radius: 1.4cqmin;
   background: #d9d5cb;
-}
-.is-landscape .card__art {
-  border-radius: 0;
 }
 
 .card__img,
@@ -266,57 +246,6 @@
   white-space: nowrap;
 }
 
-/* ---------- landscape: Decision style ---------- */
-.is-landscape .card__plaque {
-  background: var(--band);
-  color: #fff;
-  padding: 3.6cqmin 5cqmin 3.8cqmin;
-}
-.is-landscape .card__plaque::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 1.2cqmin;
-  background: var(--rc);
-}
-.is-landscape .card__name {
-  font-family: 'Archivo', 'DM Sans', sans-serif;
-  font-weight: 800;
-  font-size: 6cqmin;
-  line-height: 1.08;
-  text-transform: uppercase;
-  letter-spacing: 0;
-}
-.is-landscape .card__desc {
-  color: rgb(255 255 255 / 0.62);
-  -webkit-line-clamp: 1;
-  margin-top: 0.8cqmin;
-}
-.is-landscape .card__meta {
-  color: rgb(255 255 255 / 0.45);
-  margin-top: 1.6cqmin;
-}
-.card__top {
-  position: absolute;
-  z-index: 5;
-  top: 3.4cqmin;
-  left: 4.4cqmin;
-  right: 4.4cqmin;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.card__brand {
-  font-family: 'Archivo', 'DM Sans', sans-serif;
-  font-weight: 700;
-  font-size: 3cqmin;
-  letter-spacing: 0.3em;
-  color: #fff;
-  text-shadow: 0 0.3cqmin 1.2cqmin rgb(0 0 0 / 0.7);
-}
-
 /* ---------- rarity letter: a highlight runs across it as the card moves ---------- */
 .rmark {
   flex: none;
@@ -342,14 +271,7 @@
   color: transparent;
   filter: drop-shadow(0 0 calc(var(--hov) * 1.4cqmin) color-mix(in srgb, var(--rc) 70%, transparent));
 }
-.rmark--chip {
-  font-family: 'Archivo', 'DM Sans', sans-serif;
-  font-size: 3.6cqmin;
-  padding: 1cqmin 2.6cqmin;
-  border-radius: 99px;
-  border: 0.5cqmin solid var(--rc);
-  background: rgb(14 14 16 / 0.6);
-}
+
 
 /* ---------- rarity pill used by the UI (binder, sheet) ---------- */
 .rbadge {
@@ -511,18 +433,6 @@
   mix-blend-mode: multiply;
   opacity: calc(0.35 + var(--hov) * 0.3);
 }
-.is-landscape.f-reverse .card__plaque::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--holo);
-  background-size: 420% 420%;
-  background-position: calc(var(--px) * 100%) calc(var(--py) * 100%);
-  mix-blend-mode: color-dodge;
-  opacity: calc(0.35 + var(--hov) * 0.4);
-  pointer-events: none;
-}
-
 /* Holo: iridescent rim around the art */
 .f-holo .card__art {
   box-shadow:

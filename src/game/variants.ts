@@ -19,8 +19,8 @@ export interface FinishInfo {
 }
 
 export const FINISHES: FinishInfo[] = [
-  { id: 'normal', label: 'Mat', blurb: 'Finition mate, sans reflet.', hit: 0, weights: [90, 88, 72, 0, 0, 0] },
-  { id: 'reverse', label: 'Reverse Holo', blurb: 'Le fond de la carte brille, l’illustration reste mate.', hit: 0, weights: [10, 12, 14, 0, 0, 0] },
+  { id: 'normal', label: 'Mat', blurb: 'Finition mate, sans reflet.', hit: 0, weights: [96.5, 96.5, 82.5, 0, 0, 0] },
+  { id: 'reverse', label: 'Reverse Holo', blurb: 'Le fond de la carte brille, l’illustration reste mate.', hit: 0, weights: [3.5, 3.5, 3.5, 0, 0, 0] },
   { id: 'holo', label: 'Holo', blurb: 'L’illustration est couverte d’un film arc-en-ciel.', hit: 0, weights: [0, 0, 9, 58, 50, 44] },
   { id: 'cosmos', label: 'Cosmos', blurb: 'Foil étoilé : une nuée d’étoiles dans le reflet.', hit: 1, weights: [0, 0, 1.7, 9, 10, 10] },
   { id: 'shattered', label: 'Verre brisé', blurb: 'Foil à éclats de verre qui accrochent la lumière.', hit: 1, weights: [0, 0, 1.7, 9, 10, 10] },
@@ -46,8 +46,8 @@ export interface SpecialInfo {
 export const SPECIALS: SpecialInfo[] = [
   { id: 'signed', label: 'Signée', blurb: 'Porte la signature du personnage. Toujours numérotée.', chance: 1 / 300, hit: 2 },
   { id: 'goldsil', label: 'Silhouette dorée', blurb: 'Le personnage est frappé à la feuille d’or.', chance: 1 / 500, hit: 2 },
-  { id: 'altart', label: 'Alternate Art', blurb: 'Illustration alternative, cadre orné.', chance: 1 / 250, hit: 2 },
-  { id: 'blacklabel', label: 'Black Label', blurb: 'Carte noire brillante.', chance: 1 / 400, hit: 2 },
+  { id: 'altart', label: 'Alternate Art', blurb: 'Illustration alternative, cadre orné.', chance: 1 / 1000, hit: 2 },
+  { id: 'blacklabel', label: 'Black Label', blurb: 'Carte noire brillante.', chance: 1 / 1500, hit: 2 },
 ];
 export const SPECIAL_BY_ID = Object.fromEntries(SPECIALS.map((s) => [s.id, s])) as Record<Special, SpecialInfo>;
 
@@ -64,8 +64,6 @@ function rollFinish(card: CardData, rnd: () => number): Finish {
   let x = rnd() * total;
   for (const f of FINISHES) {
     if (x < f.weights[card.r]) {
-      // No gold landscape cards.
-      if (f.id === 'gold' && card.k === 'e') return 'holo';
       return f.id;
     }
     x -= f.weights[card.r];

@@ -57,10 +57,11 @@ export function Showcase({ cards }: { cards: CardData[] }) {
         <>
           <h2 className="showcase__h">Événements (cartes horizontales)</h2>
           <div className="grid">
+            <Item card={event} look={{ finish: 'normal' }} label="Mat" />
             <Item card={event} look={{ finish: 'holo' }} label="Holo" />
             <Item card={event} look={{ finish: 'shattered' }} label="Verre brisé" />
             <Item card={event} look={{ finish: 'holo', full: true }} label="Holo · Full Art" />
-            <Item card={event} look={{ finish: 'rainbow' }} label="Rainbow" />
+            <Item card={event} look={{ finish: 'gold' }} label="Gold" />
           </div>
         </>
       )}

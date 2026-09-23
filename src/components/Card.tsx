@@ -96,11 +96,6 @@ export function Card({
                       <div className="fx fx--goldsil-shine" />
                     </>
                   )}
-                  {landscape && (
-                    <div className="card__top">
-                      <RarityMark rarity={card.r} chip />
-                    </div>
-                  )}
                   {serial && (
                     <div className="card__serial">
                       {oneOfOne ? (
@@ -119,7 +114,7 @@ export function Card({
               <div className="card__plaque">
                 <div className="card__titlerow">
                   <div className={`card__name ${nameSize(card.t)}`}>{card.t}</div>
-                  {!landscape && <RarityMark rarity={card.r} />}
+                  <RarityMark rarity={card.r} />
                 </div>
                 <div className="card__desc">{card.d}</div>
                 <CardMeta card={card} />
@@ -186,10 +181,10 @@ function CardArt({ sources, name }: { sources: (string | undefined)[]; name: str
 }
 
 /** The rarity letter printed on the card; a highlight runs across it as the card tilts. */
-function RarityMark({ rarity, chip = false }: { rarity: number; chip?: boolean }) {
+function RarityMark({ rarity }: { rarity: number }) {
   const r = RARITIES[rarity];
   return (
-    <span className={`rmark ${chip ? 'rmark--chip' : ''}`} title={r.label}>
+    <span className="rmark" title={r.label}>
       <span className="rmark__txt">{r.short}</span>
     </span>
   );

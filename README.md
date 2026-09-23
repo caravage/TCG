@@ -70,11 +70,11 @@ Chaque carte reçoit une finition, tirée selon sa rareté (poids C / UC / R / U
 | Finition | Aspect | Disponible |
 |---|---|---|
 | Mat | sans reflet | C → R |
-| Reverse Holo | le fond de la carte brille, l’illustration reste mate | C → R |
+| Reverse Holo | le fond de la carte brille, l’illustration reste mate (3,5 %) | C → R |
 | Holo | film arc-en-ciel sur l’illustration | R → M |
 | Cosmos · Verre brisé · Cold Foil | foils thématiques : étoiles, éclats, ondes | R → M |
 | Gravé | micro-relief granuleux et doré | UR → M |
-| Gold · Rainbow · Ghost · Starlight | finitions extrêmes | UR → M (pas de Gold horizontale) |
+| Gold · Rainbow · Ghost · Starlight | finitions extrêmes | UR → M |
 
 Les poids exacts sont dans `src/game/variants.ts` ; l’onglet *Effets* (mode test) affiche les chances.
 
@@ -86,8 +86,8 @@ Les poids exacts sont dans `src/game/variants.ts` ; l’onglet *Effets* (mode te
 |---|---|
 | Signée (si la page a une signature ; toujours numérotée) | 1 / 300 |
 | Silhouette dorée (portraits détourés) | 1 / 500 |
-| Alternate Art | 1 / 250 |
-| Black Label (carte noire brillante) | 1 / 400 |
+| Alternate Art | 1 / 1 000 |
+| Black Label (carte noire brillante) | 1 / 1 500 |
 
 ### Numérotées (cumulables avec une variante)
 
