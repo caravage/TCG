@@ -16,8 +16,10 @@ export interface CardData {
   alt?: string;
   /** Signature image URL (enables Signed). */
   sig?: string;
-  /** Page views over the reference year. */
+  /** Popularity: median of yearly page views since 2016 (drives rarity). */
   views: number;
+  /** Page views over the last 12 months. */
+  v12?: number;
   r: Rarity;
   /** Wikipedia article URL. */
   url: string;
@@ -29,6 +31,9 @@ export interface CardData {
   y2?: number;
   /** 1 when public/masks/<id>.png (subject cut-out) exists. */
   m?: 1;
+  /** Focal point of the subject (object-position %, from the mask). */
+  fx?: number;
+  fy?: number;
 }
 
 export interface CardSet {

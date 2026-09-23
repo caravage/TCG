@@ -168,6 +168,14 @@
   background: #d9d5cb;
 }
 
+.card {
+  /* Focal point: from the subject mask when known, else a portrait-friendly default. */
+  --fx: 50%;
+  --fy: 22%;
+}
+.card.is-landscape {
+  --fy: 45%;
+}
 .card__img,
 .card__fallback {
   position: absolute;
@@ -175,10 +183,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 22%;
-}
-.is-landscape .card__img {
-  object-position: 50% 45%;
+  object-position: var(--fx) var(--fy);
 }
 .card__fallback {
   display: grid;
@@ -798,17 +803,12 @@
   z-index: 3;
   -webkit-mask-size: cover;
   mask-size: cover;
-  -webkit-mask-position: 50% 22%;
-  mask-position: 50% 22%;
+  -webkit-mask-position: var(--fx) var(--fy);
+  mask-position: var(--fx) var(--fy);
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 }
-.is-landscape .fx--bgholo,
-.is-landscape .fx--goldsil,
-.is-landscape .fx--goldsil-shine {
-  -webkit-mask-position: 50% 45%;
-  mask-position: 50% 45%;
-}
+
 /* Holo de fond: everything but the subject */
 .fx--bgholo {
   background-image:

@@ -20,6 +20,15 @@ export interface CardProps {
 
 export const isLandscape = (card: CardData) => card.k === 'e';
 
+/** Every image a card may show, for preloading before the reveal. */
+export function cardImages(card: CardData, look: Look): string[] {
+  const out = [card.img];
+  if (look.special === 'altart' && card.alt) out.push(card.alt);
+  if (look.special === 'signed' && card.sig) out.push(card.sig);
+  if (card.m) out.push(`${import.meta.env.BASE_URL}masks/${card.id}.png`);
+  return out;
+}
+
 // Which effect layers each finish uses.
 const ART_FILM: Finish[] = ['holo', 'rainbow', 'starlight'];
 const THEMED: Finish[] = ['cosmos', 'shattered', 'cold'];
@@ -65,6 +74,7 @@ export function Card({
   const style = {
     '--w': `${width}px`,
     ...(mask ? { '--mask': mask } : {}),
+    ...(card.fx != null ? { '--fx': `${card.fx}%`, '--fy': `${card.fy}%` } : {}),
     width: landscape ? width * 1.4 : width,
     height: landscape ? width : width * 1.4,
   } as CSSProperties;

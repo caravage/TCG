@@ -3,7 +3,7 @@ import { openPack, type Pools } from '../game/pack';
 import { RARITIES } from '../game/rarity';
 import { FINISH_BY_ID, FULL_ART, SPECIAL_BY_ID } from '../game/variants';
 import type { Pack, Pull } from '../game/types';
-import { Card, isLandscape } from './Card';
+import { Card, cardImages, isLandscape } from './Card';
 import { CardModal } from './CardModal';
 import { PackVisual } from './PackVisual';
 import { PALETTES, burst } from './particles';
@@ -57,6 +57,17 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
   useEffect(() => {
     setPack(openPack(pools));
   }, [pools]);
+
+  // Download every picture of the waiting pack before it is torn, so no card flips onto a blank.
+  useEffect(() => {
+    for (const p of pack.pulls) {
+      for (const src of cardImages(p.card, p)) {
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = src;
+      }
+    }
+  }, [pack]);
 
   const best = useMemo(() => pack.pulls.reduce((m, p) => Math.max(m, p.card.r), 0), [pack]);
 

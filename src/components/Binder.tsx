@@ -4,6 +4,7 @@ import { lookRank } from '../game/variants';
 import type { Entry, SaveData } from '../game/storage';
 import type { CardData, Rarity } from '../game/types';
 import { Card, RarityBadge } from './Card';
+import { BinderBook } from './BinderBook';
 import { CardModal } from './CardModal';
 
 interface Props {
@@ -27,12 +28,19 @@ export function Binder({ cards, byId, save, testMode }: Props) {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<Sort>('number');
   const [selected, setSelected] = useState<Selected | null>(null);
+  const [view, setView] = useState<'book' | 'list'>('book');
 
   const entries = useMemo(
     () => Object.values(save.collection).filter((e) => byId.has(e.id)),
     [save.collection, byId],
   );
   const ownedIds = useMemo(() => new Set(entries.map((e) => e.id)), [entries]);
+  const entriesById = useMemo(() => {
+    const m = new Map<string, Entry[]>();
+    for (const e of entries) m.set(e.id, [...(m.get(e.id) ?? []), e]);
+    return m;
+  }, [entries]);
+  const bookCards = useMemo(() => (rarity === 'all' ? cards : cards.filter((c) => c.r === rarity)), [cards, rarity]);
 
   const stats = useMemo(() => {
     const perRarity = RARITIES.map((r) => ({
@@ -111,7 +119,17 @@ export function Binder({ cards, byId, save, testMode }: Props) {
       </div>
 
       <div className="filters">
+        <div className="seg" role="tablist">
+          <button className={view === 'book' ? 'is-active' : ''} onClick={() => setView('book')}>
+            Classeur
+          </button>
+          <button className={view === 'list' ? 'is-active' : ''} onClick={() => setView('list')}>
+            Liste
+          </button>
+        </div>
         <input className="search" placeholder="Rechercher un nom…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        {view === 'list' && (
+          <>
         <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
           <option value="number">Tri : numéro</option>
           <option value="rarity">Tri : rareté</option>
@@ -125,14 +143,21 @@ export function Binder({ cards, byId, save, testMode }: Props) {
           <input type="checkbox" checked={showMissing} onChange={(e) => setShowMissing(e.target.checked)} />
           Afficher les manquantes
         </label>
+          </>
+        )}
       </div>
 
-      {visibleEntries.length === 0 && missing.length === 0 && (
+      {view === 'book' && (
+        <BinderBook cards={bookCards} entriesById={entriesById} query={query} onOpen={(card, entry) => setSelected({ card, entry })} />
+      )}
+
+      {view === 'list' && visibleEntries.length === 0 && missing.length === 0 && (
         <div className="empty">
           {entries.length === 0 ? 'Ton cahier est vide — ouvre ton premier paquet !' : 'Aucune carte ne correspond.'}
         </div>
       )}
 
+      {view === 'list' && (
       <div className="grid">
         {visibleEntries.map((e) => {
           const c = byId.get(e.id)!;
@@ -153,6 +178,7 @@ export function Binder({ cards, byId, save, testMode }: Props) {
           </div>
         ))}
       </div>
+      )}
 
       {selected && (
         <CardModal
