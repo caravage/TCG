@@ -3,7 +3,8 @@
 
 Reads public/cards.json, downloads each portrait illustration, runs rembg (U²-Net) on it
 and writes public/masks/<id>.png: a small PNG whose alpha is the subject. Cards with a
-usable mask get "m": 1, which enables the masked variants (Holo de fond, Silhouette dorée).
+usable mask get "m": 1 (enables Silhouette dorée) and a focal point "fx"/"fy" (percent) used
+to frame the picture on the subject's face.
 
 Existing masks are kept, so reruns only process new cards.
 Usage: pip install "rembg[cpu]" pillow && python scripts/build-masks.py
@@ -37,6 +38,20 @@ def download(url: str) -> Image.Image:
     raise RuntimeError("unreachable")
 
 
+def focal_point(path: str):
+    """Where to aim the crop: horizontally the subject's centre, vertically its face
+    (the top sixth of the silhouette). Returned as object-position percentages."""
+    alpha = Image.open(path).getchannel("A").point(lambda v: 255 if v > 110 else 0)
+    box = alpha.getbbox()
+    if not box:
+        return None
+    w, h = alpha.size
+    x0, y0, x1, y1 = box
+    fx = (x0 + x1) / 2 / w
+    fy = (y0 + (y1 - y0) * 0.16) / h
+    return round(min(max(fx, 0), 1) * 100), round(min(max(fy, 0), 1) * 100)
+
+
 def main() -> None:
     data = json.load(open(CARDS, encoding="utf-8"))
     os.makedirs(OUT, exist_ok=True)
@@ -68,8 +83,14 @@ def main() -> None:
             print(f"  … {i}/{len(portraits)} ({time.time() - t0:.0f}s)", flush=True)
 
     for c in data["cards"]:
-        if c.get("k") == "p" and os.path.exists(f"{OUT}/{c['id']}.png"):
+        path = f"{OUT}/{c['id']}.png"
+        c.pop("fx", None)
+        c.pop("fy", None)
+        if c.get("k") == "p" and os.path.exists(path):
             c["m"] = 1
+            focal = focal_point(path)
+            if focal:
+                c["fx"], c["fy"] = focal
         else:
             c.pop("m", None)
     with open(CARDS, "w", encoding="utf-8") as f:

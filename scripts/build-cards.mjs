@@ -213,28 +213,52 @@ async function getCandidates() {
 // ---------------------------------------------------------------------------
 // 2. Page views
 // ---------------------------------------------------------------------------
-function lastTwelveMonths() {
+/**
+ * Popularity = median of yearly page views since 2016 (first full year of the API), so a
+ * one-off spike in the news does not make a card rare. Years before the article existed
+ * (no data) are ignored; the current partial year only counts through the last 12 months.
+ */
+function viewsPeriod() {
   const now = new Date();
   const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 0)); // last day of previous month
-  const start = new Date(Date.UTC(end.getUTCFullYear() - 1, end.getUTCMonth() + 1, 1));
   const f = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
-  return { start: f(start), end: f(end) };
+  return { start: '20160101', end: f(end), lastYearFrom: new Date(Date.UTC(end.getUTCFullYear() - 1, end.getUTCMonth() + 1, 1)) };
+}
+
+function median(xs) {
+  if (!xs.length) return 0;
+  const s = [...xs].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2);
 }
 
 async function getViews(candidates) {
-  const { start, end } = lastTwelveMonths();
-  console.log(`2. Page views ${start} → ${end} for ${candidates.length} articles`);
-  const views = await pool(candidates, 24, async (c) => {
+  const { start, end, lastYearFrom } = viewsPeriod();
+  console.log(`2. Page views ${start} → ${end} (median of yearly totals) for ${candidates.length} articles`);
+  const series = await pool(candidates, 24, async (c) => {
     const title = encodeURIComponent(c.title.replace(/ /g, '_'));
     const url = `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/fr.wikipedia.org/all-access/user/${title}/monthly/${start}/${end}`;
-    return cached('views', url, async () => {
+    return cached('views-monthly', url, async () => {
       const res = await fetchRetry(url, {}, { okStatuses: [404] });
-      if (res.status === 404) return 0;
+      if (res.status === 404) return [];
       const json = await res.json();
-      return json.items.reduce((s, it) => s + it.views, 0);
+      return json.items.map((it) => [it.timestamp.slice(0, 6), it.views]);
     });
   });
-  candidates.forEach((c, i) => (c.views = views[i]));
+  candidates.forEach((c, i) => {
+    const byYear = new Map(); // year → [total, months with data]
+    let last12 = 0;
+    for (const [ym, v] of series[i]) {
+      const y = Number(ym.slice(0, 4));
+      const [t, n] = byYear.get(y) || [0, 0];
+      byYear.set(y, [t + v, n + 1]);
+      if (new Date(Date.UTC(y, Number(ym.slice(4, 6)) - 1, 1)) >= lastYearFrom) last12 += v;
+    }
+    // Only complete years count (the article existed all year), plus the last 12 months.
+    const full = [...byYear.values()].filter(([, n]) => n === 12).map(([t]) => t);
+    c.views12 = last12;
+    c.views = median([...full, last12]);
+  });
   return { start, end };
 }
 
@@ -325,12 +349,12 @@ async function getThumbs(files, width) {
   return out;
 }
 
-async function getExtracts(titles) {
+async function getExtracts(titles, sentences = 1) {
   if (!titles.length) return new Map();
-  console.log(`  extracts for ${titles.length} articles without description`);
+  console.log(`  extracts (${sentences} sentence${sentences > 1 ? 's' : ''}) for ${titles.length} articles`);
   const out = new Map();
   await pool(chunks(titles, 20), 3, async (batch) => {
-    const url = `https://fr.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=extracts&exintro=1&explaintext=1&exsentences=1&exlimit=20&redirects=1&titles=${encodeURIComponent(batch.join('|'))}`;
+    const url = `https://fr.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=extracts&exintro=1&explaintext=1&exsentences=${sentences}&exlimit=20&redirects=1&titles=${encodeURIComponent(batch.join('|'))}`;
     const json = await cached('extracts', url, async () => (await fetchRetry(url)).json());
     const norm = new Map([...(json.query?.normalized || []), ...(json.query?.redirects || [])].map((n) => [n.to, n.from]));
     for (const page of json.query?.pages || []) {
@@ -402,6 +426,7 @@ async function main() {
       d: cleanDesc(e.desc || extracts.get(c.title) || ''),
       img: mainThumbs.get(e.img[0]),
       views: c.views,
+      v12: c.views12,
       r: 0,
       url: `https://fr.wikipedia.org/wiki/${encodeURIComponent(c.title.replace(/ /g, '_'))}`,
     };
@@ -418,6 +443,16 @@ async function main() {
     return card;
   });
   assignRarity(cards);
+
+  // Card backs: the opening of each article, loaded lazily by the card sheet.
+  const intros = await getExtracts(withImage.map((c) => c.title), 4);
+  const backs = {};
+  for (const c of withImage) {
+    const t = (intros.get(c.title) || '').replace(/\s+/g, ' ').trim();
+    if (t) backs[c.id] = t.length > 700 ? t.slice(0, 697).replace(/\s+\S*$/, '') + '…' : t;
+  }
+  writeFileSync('public/extracts.json', JSON.stringify(backs));
+  console.log(`  extracts.json: ${Object.keys(backs).length} card backs`);
 
   const out = { version: 2, generatedAt: new Date().toISOString(), period: `${period.start}-${period.end}`, cards };
   writeFileSync('public/cards.json', JSON.stringify(out));

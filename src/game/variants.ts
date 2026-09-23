@@ -51,6 +51,7 @@ export const SPECIALS: SpecialInfo[] = [
 ];
 export const SPECIAL_BY_ID = Object.fromEntries(SPECIALS.map((s) => [s.id, s])) as Record<Special, SpecialInfo>;
 
+export const ALT_ART_MIN_RARITY = 2;
 export const FULL_ART = { label: 'Full Art', blurb: 'L’illustration couvre toute la carte.', chance: 1 / 60, minRarity: 1, hit: 2 };
 
 export function finishChance(f: Finish, r: Rarity): number {
@@ -74,6 +75,7 @@ function rollFinish(card: CardData, rnd: () => number): Finish {
 function specialAllowed(s: Special, card: CardData): boolean {
   if (s === 'signed') return !!card.sig;
   if (s === 'goldsil') return !!card.m;
+  if (s === 'altart') return card.r >= ALT_ART_MIN_RARITY;
   return true;
 }
 
