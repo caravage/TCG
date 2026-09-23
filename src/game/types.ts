@@ -39,30 +39,36 @@ export interface CardSet {
   cards: CardData[];
 }
 
-export type VariantId =
+export type Finish =
   | 'normal'
   | 'reverse'
   | 'holo'
-  | 'bw'
-  | 'neon'
+  | 'cosmos'
+  | 'shattered'
+  | 'cold'
   | 'etched'
-  | 'fullart'
-  | 'altart'
-  | 'bgholo'
-  | 'goldsil'
-  | 'signed'
   | 'gold'
-  | 'rainbow';
+  | 'rainbow'
+  | 'ghost'
+  | 'starlight';
+
+export type Special = 'blacklabel' | 'altart' | 'goldsil' | 'signed';
+
+/** How a printed card looks: finish + optional Full Art + optional special treatment. */
+export interface Look {
+  finish: Finish;
+  full?: boolean;
+  special?: Special;
+}
 
 export interface Serial {
   num: number;
   of: number;
 }
 
-export interface Pull {
+export interface Pull extends Look {
   uid: string;
   card: CardData;
-  variant: VariantId;
   serial?: Serial;
   /** 0 = nothing special, 4 = 1 of 1. Drives suspense and particles. */
   hit: number;

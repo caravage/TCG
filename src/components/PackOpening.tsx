@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { openPack, type Pools } from '../game/pack';
 import { RARITIES } from '../game/rarity';
-import { VARIANT_BY_ID } from '../game/variants';
+import { FINISH_BY_ID, FULL_ART, SPECIAL_BY_ID } from '../game/variants';
 import type { Pack, Pull } from '../game/types';
 import { Card, isLandscape } from './Card';
 import { CardModal } from './CardModal';
@@ -22,8 +22,8 @@ type Phase = 'idle' | 'burst' | 'reveal' | 'summary';
 const RARITY_GLOW = ['#d9d5cb', '#2e9e6b', '#2f6fd6', '#8a4be0', '#e8741a', '#d6243a'];
 
 export function particleColors(p: Pull): string[] {
-  if (p.variant === 'gold' || p.serial?.of === 1) return PALETTES.gold;
-  if (p.variant === 'rainbow') return ['#ff6b6b', '#ffd36b', '#7dff9b', '#6be4ff', '#8a7dff', '#ff7de9'];
+  if (p.finish === 'gold' || p.special === 'goldsil' || p.serial?.of === 1) return PALETTES.gold;
+  if (p.finish === 'rainbow' || p.finish === 'starlight') return ['#ff6b6b', '#ffd36b', '#7dff9b', '#6be4ff', '#8a7dff', '#ff7de9'];
   return PALETTES[RARITIES[p.card.r].key as keyof typeof PALETTES];
 }
 
@@ -32,7 +32,9 @@ function hitTitle(p: Pull): string | null {
   if (p.serial?.of === 1) return 'Exemplaire unique · 1 sur 1';
   const parts: string[] = [];
   if (p.card.r >= 3) parts.push(RARITIES[p.card.r].label);
-  if (VARIANT_BY_ID[p.variant].hit >= 1) parts.push(VARIANT_BY_ID[p.variant].label);
+  if (FINISH_BY_ID[p.finish].hit >= 1) parts.push(FINISH_BY_ID[p.finish].label);
+  if (p.full) parts.push(FULL_ART.label);
+  if (p.special) parts.push(SPECIAL_BY_ID[p.special].label);
   if (p.serial) parts.push(`Numérotée ${p.serial.num}/${p.serial.of}`);
   return parts.length ? parts.join(' · ') : null;
 }
@@ -183,7 +185,7 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
             {bigHit && <div className="rays" style={{ '--ray': particleColors(current)[0] } as CSSProperties} />}
             {pulls.slice(index + 1, index + 3).map((p, i) => (
               <div key={p.uid} className="reveal__under" style={{ '--i': i + 1 } as CSSProperties}>
-                <Card card={p.card} variant={p.variant} faceDown interactive={false} width={330} />
+                <Card card={p.card} look={p} faceDown interactive={false} width={330} />
               </div>
             ))}
             <div
@@ -193,7 +195,7 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
             >
               <Card
                 card={current.card}
-                variant={current.variant}
+                look={current}
                 serial={current.serial}
                 faceDown={!flipped}
                 hint={flipped ? 0 : current.hit}
@@ -209,7 +211,7 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
             {pulls.map((p, i) => (
               <div key={p.uid} className={`tray__slot ${i < index || (i === index && flipped) ? 'is-filled' : ''}`}>
                 {(i < index || (i === index && flipped)) && (
-                  <Card card={p.card} variant={p.variant} serial={p.serial} width={isLandscape(p.card) ? 44 : 62} interactive={false} />
+                  <Card card={p.card} look={p} serial={p.serial} width={isLandscape(p.card) ? 44 : 62} interactive={false} />
                 )}
               </div>
             ))}
@@ -232,7 +234,7 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
                 style={{ '--d': `${i * 70}ms` } as CSSProperties}
                 onClick={() => setSheet(p)}
               >
-                <Card card={p.card} variant={p.variant} serial={p.serial} width={196} />
+                <Card card={p.card} look={p} serial={p.serial} width={196} />
                 {p.isNew && <span className="badge-new">Nouveau</span>}
               </div>
             ))}
@@ -249,7 +251,7 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
         </div>
       )}
       {sheet && (
-        <CardModal card={sheet.card} variant={sheet.variant} serial={sheet.serial} onClose={() => setSheet(null)} />
+        <CardModal card={sheet.card} look={sheet} serial={sheet.serial} onClose={() => setSheet(null)} />
       )}
     </section>
   );

@@ -1,65 +1,114 @@
-import type { CardData, Serial, VariantId } from './types';
+import type { CardData, Finish, Look, Rarity, Serial, Special } from './types';
 
-export interface VariantInfo {
-  id: VariantId;
+/**
+ * A card's look has three independent parts:
+ *  - a finish (foil), whose odds depend on the card's rarity;
+ *  - Full Art, which combines with any finish (Peu commune and above);
+ *  - at most one special treatment (Black Label, Alternate Art, Silhouette dorée, Signée).
+ * Numbered prints are rolled separately; signed cards are always numbered.
+ */
+
+export interface FinishInfo {
+  id: Finish;
   label: string;
-  /** Chance per card. Signed is rolled separately, only on cards with a signature. */
-  chance: number;
+  blurb: string;
   /** Suspense / particle level (0-3). */
   hit: number;
+  /** Weight per rarity, C → M (0 = not available at that rarity). */
+  weights: [number, number, number, number, number, number];
+}
+
+export const FINISHES: FinishInfo[] = [
+  { id: 'normal', label: 'Mat', blurb: 'Finition mate, sans reflet.', hit: 0, weights: [90, 88, 72, 0, 0, 0] },
+  { id: 'reverse', label: 'Reverse Holo', blurb: 'Le fond de la carte brille, l’illustration reste mate.', hit: 0, weights: [10, 12, 14, 0, 0, 0] },
+  { id: 'holo', label: 'Holo', blurb: 'L’illustration est couverte d’un film arc-en-ciel.', hit: 0, weights: [0, 0, 9, 58, 50, 44] },
+  { id: 'cosmos', label: 'Cosmos', blurb: 'Foil étoilé : une nuée d’étoiles dans le reflet.', hit: 1, weights: [0, 0, 1.7, 9, 10, 10] },
+  { id: 'shattered', label: 'Verre brisé', blurb: 'Foil à éclats de verre qui accrochent la lumière.', hit: 1, weights: [0, 0, 1.7, 9, 10, 10] },
+  { id: 'cold', label: 'Cold Foil', blurb: 'Foil argenté à ondes concentriques.', hit: 1, weights: [0, 0, 1.6, 9, 10, 10] },
+  { id: 'etched', label: 'Gravé', blurb: 'Micro-relief granuleux et doré qui capte la lumière.', hit: 1, weights: [0, 0, 0, 12, 14, 16] },
+  { id: 'gold', label: 'Gold', blurb: 'Entièrement dorée.', hit: 3, weights: [0, 0, 0, 1.2, 2, 3] },
+  { id: 'rainbow', label: 'Rainbow', blurb: 'Reflets iridescents multicolores intenses.', hit: 3, weights: [0, 0, 0, 0.9, 1.6, 2.6] },
+  { id: 'ghost', label: 'Ghost', blurb: 'Visuel argenté, presque invisible.', hit: 3, weights: [0, 0, 0, 0.6, 1.4, 2.4] },
+  { id: 'starlight', label: 'Starlight', blurb: 'Paillettes 3D scintillantes.', hit: 3, weights: [0, 0, 0, 0.3, 1, 2] },
+];
+
+export const FINISH_BY_ID = Object.fromEntries(FINISHES.map((f) => [f.id, f])) as Record<Finish, FinishInfo>;
+
+export interface SpecialInfo {
+  id: Special;
+  label: string;
   blurb: string;
+  chance: number;
+  hit: number;
 }
 
-export const SIGNED_CHANCE = 1 / 300;
-
-export const VARIANTS: VariantInfo[] = [
-  { id: 'reverse', label: 'Reverse Holo', chance: 0.08, hit: 0, blurb: 'Le cadre scintille, pas l’illustration.' },
-  { id: 'holo', label: 'Holo', chance: 0.04, hit: 0, blurb: 'L’illustration est holographique.' },
-  { id: 'bw', label: 'Noir & Blanc', chance: 0.015, hit: 1, blurb: 'Tirage argentique monochrome.' },
-  { id: 'neon', label: 'Néon', chance: 0.01, hit: 1, blurb: 'Contours lumineux façon enseigne au néon.' },
-  { id: 'etched', label: 'Foil gravé', chance: 0.008, hit: 1, blurb: 'Texture métallique gravée en relief.' },
-  { id: 'bgholo', label: 'Holo de fond', chance: 1 / 150, hit: 1, blurb: 'Le décor scintille, le personnage reste mat.' },
-  { id: 'fullart', label: 'Full Art', chance: 1 / 250, hit: 2, blurb: 'L’illustration couvre toute la carte.' },
-  { id: 'altart', label: 'Alternate Art', chance: 1 / 500, hit: 2, blurb: 'Illustration alternative, cadre orné.' },
-  { id: 'goldsil', label: 'Silhouette dorée', chance: 1 / 800, hit: 2, blurb: 'Le personnage est frappé à la feuille d’or.' },
-  { id: 'gold', label: 'Gold', chance: 1 / 1250, hit: 3, blurb: 'Entièrement dorée.' },
-  { id: 'rainbow', label: 'Rainbow', chance: 1 / 5000, hit: 3, blurb: 'Prisme arc-en-ciel galactique.' },
+/** Rolled in this order; the first hit wins. */
+export const SPECIALS: SpecialInfo[] = [
+  { id: 'signed', label: 'Signée', blurb: 'Porte la signature du personnage. Toujours numérotée.', chance: 1 / 300, hit: 2 },
+  { id: 'goldsil', label: 'Silhouette dorée', blurb: 'Le personnage est frappé à la feuille d’or.', chance: 1 / 500, hit: 2 },
+  { id: 'altart', label: 'Alternate Art', blurb: 'Illustration alternative, cadre orné.', chance: 1 / 250, hit: 2 },
+  { id: 'blacklabel', label: 'Black Label', blurb: 'Carte noire brillante.', chance: 1 / 400, hit: 2 },
 ];
+export const SPECIAL_BY_ID = Object.fromEntries(SPECIALS.map((s) => [s.id, s])) as Record<Special, SpecialInfo>;
 
-export const VARIANT_BY_ID: Record<VariantId, VariantInfo> = {
-  normal: { id: 'normal', label: 'Normale', chance: 0, hit: 0, blurb: '' },
-  signed: { id: 'signed', label: 'Signée', chance: SIGNED_CHANCE, hit: 2, blurb: 'Porte la signature du personnage.' },
-  ...Object.fromEntries(VARIANTS.map((v) => [v.id, v])),
-} as Record<VariantId, VariantInfo>;
+export const FULL_ART = { label: 'Full Art', blurb: 'L’illustration couvre toute la carte.', chance: 1 / 60, minRarity: 1, hit: 2 };
 
-/** Display order (rarest last). */
-export const VARIANT_ORDER: VariantId[] = [
-  'normal', 'reverse', 'holo', 'bw', 'neon', 'etched', 'bgholo', 'fullart', 'altart', 'goldsil', 'signed', 'gold', 'rainbow',
-];
+export function finishChance(f: Finish, r: Rarity): number {
+  const w = FINISH_BY_ID[f].weights;
+  const total = FINISHES.reduce((s, x) => s + x.weights[r], 0);
+  return w[r] / total;
+}
 
-export function rollVariant(card: CardData, rnd: () => number): VariantId {
-  if (card.sig && rnd() < SIGNED_CHANCE) return 'signed';
-  let x = rnd();
-  for (const v of VARIANTS) {
-    if (x < v.chance) {
-      // Masked effects need a subject cut-out; no gold landscape cards.
-      if ((v.id === 'bgholo' || v.id === 'goldsil') && !card.m) return 'normal';
-      if (v.id === 'gold' && card.k === 'e') return 'normal';
-      return v.id;
+function rollFinish(card: CardData, rnd: () => number): Finish {
+  const total = FINISHES.reduce((s, f) => s + f.weights[card.r], 0);
+  let x = rnd() * total;
+  for (const f of FINISHES) {
+    if (x < f.weights[card.r]) {
+      // No gold landscape cards.
+      if (f.id === 'gold' && card.k === 'e') return 'holo';
+      return f.id;
     }
-    x -= v.chance;
+    x -= f.weights[card.r];
   }
-  return 'normal';
+  return FINISHES.find((f) => f.weights[card.r] > 0)!.id;
 }
 
-/** Signed cards are always numbered: 1/1 1 %, /10 9 %, /50 30 %, /100 60 %. */
-export function rollSignedSerial(rnd: () => number): Serial {
-  const x = rnd();
-  const of = x < 0.01 ? 1 : x < 0.1 ? 10 : x < 0.4 ? 50 : 100;
-  return { of, num: 1 + Math.floor(rnd() * of) };
+function specialAllowed(s: Special, card: CardData): boolean {
+  if (s === 'signed') return !!card.sig;
+  if (s === 'goldsil') return !!card.m;
+  return true;
 }
 
-/** Numbered prints, independent from the variant. Numbers are simulated (no server yet). */
+export function rollLook(card: CardData, rnd: () => number): Look {
+  const finish = rollFinish(card, rnd);
+  const full = card.r >= FULL_ART.minRarity && rnd() < FULL_ART.chance;
+  let special: Special | undefined;
+  for (const s of SPECIALS) {
+    if (specialAllowed(s.id, card) && rnd() < s.chance) {
+      special = s.id;
+      break;
+    }
+  }
+  return { finish, ...(full ? { full } : {}), ...(special ? { special } : {}) };
+}
+
+export function lookHit(look: Look): number {
+  return Math.max(
+    FINISH_BY_ID[look.finish].hit,
+    look.full ? FULL_ART.hit : 0,
+    look.special ? SPECIAL_BY_ID[look.special].hit : 0,
+  );
+}
+
+/** "Holo · Full Art · Signée", or "Mat". */
+export function lookLabel(look: Look): string {
+  const parts = [FINISH_BY_ID[look.finish].label];
+  if (look.full) parts.push(FULL_ART.label);
+  if (look.special) parts.push(SPECIAL_BY_ID[look.special].label);
+  return parts.join(' · ');
+}
+
+/** Numbered prints, independent from the look. Numbers are simulated (no server yet). */
 export const SERIALS: { of: number; chance: number; hit: number }[] = [
   { of: 1, chance: 1 / 200_000, hit: 4 },
   { of: 10, chance: 1 / 40_000, hit: 3 },
@@ -76,6 +125,22 @@ export function rollSerial(rnd: () => number): Serial | undefined {
   return undefined;
 }
 
+/** Signed cards are always numbered: 1/1 1 %, /10 9 %, /50 30 %, /100 60 %. */
+export function rollSignedSerial(rnd: () => number): Serial {
+  const x = rnd();
+  const of = x < 0.01 ? 1 : x < 0.1 ? 10 : x < 0.4 ? 50 : 100;
+  return { of, num: 1 + Math.floor(rnd() * of) };
+}
+
 export function serialHit(serial?: Serial): number {
   return serial ? SERIALS.find((s) => s.of === serial.of)?.hit ?? 2 : 0;
+}
+
+/** Collection sort order of looks (plainest first). */
+export function lookRank(look: Look): number {
+  return (
+    FINISHES.findIndex((f) => f.id === look.finish) +
+    (look.full ? 20 : 0) +
+    (look.special ? 40 + SPECIALS.findIndex((s) => s.id === look.special) : 0)
+  );
 }

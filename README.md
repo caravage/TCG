@@ -63,22 +63,31 @@ commite le résultat. On peut la relancer à la main depuis l'onglet *Actions*.
 | 7 (rare garantie) | Rare 78 % · Ultra Rare 17 % · Légendaire 4 % · Mythique 1 % |
 | **God pack** (1 / 1 500) | 7 cartes Rare+ : Rare 55 % · Ultra Rare 30 % · Légendaire 12 % · Mythique 3 % |
 
-### Variantes (par carte, indépendantes de la rareté)
+### Finitions (selon la rareté)
+
+Chaque carte reçoit une finition, tirée selon sa rareté (poids C / UC / R / UR / L / M) :
+
+| Finition | Aspect | Disponible |
+|---|---|---|
+| Mat | sans reflet | C → R |
+| Reverse Holo | le fond de la carte brille, l’illustration reste mate | C → R |
+| Holo | film arc-en-ciel sur l’illustration | R → M |
+| Cosmos · Verre brisé · Cold Foil | foils thématiques : étoiles, éclats, ondes | R → M |
+| Gravé | micro-relief granuleux et doré | UR → M |
+| Gold · Rainbow · Ghost · Starlight | finitions extrêmes | UR → M (pas de Gold horizontale) |
+
+Les poids exacts sont dans `src/game/variants.ts` ; l’onglet *Effets* (mode test) affiche les chances.
+
+**Full Art** (1 / 60, dès UC) se combine avec n’importe quelle finition.
+
+### Variantes spéciales (au plus une par carte)
 
 | Variante | Chance |
 |---|---|
-| Reverse Holo | 8 % |
-| Holo | 4 % |
-| Noir & Blanc | 1,5 % |
-| Néon | 1 % |
-| Foil gravé | 0,8 % |
-| Holo de fond | 1 / 150 (portraits avec masque : le décor scintille, pas le personnage) |
-| Full Art | 1 / 250 |
-| Alternate Art | 1 / 500 (2ᵉ image de l’article, sinon recadrage stylisé de la principale) |
-| Signée | 1 / 300 (seulement si la page a une signature ; toujours numérotée) |
-| Silhouette dorée | 1 / 800 (portraits avec masque : le personnage en feuille d’or) |
-| Gold | 1 / 1 250 (pas sur les cartes horizontales) |
-| Rainbow | 1 / 5 000 |
+| Signée (si la page a une signature ; toujours numérotée) | 1 / 300 |
+| Silhouette dorée (portraits détourés) | 1 / 500 |
+| Alternate Art | 1 / 250 |
+| Black Label (carte noire brillante) | 1 / 400 |
 
 ### Numérotées (cumulables avec une variante)
 

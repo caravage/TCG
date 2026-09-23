@@ -1,12 +1,12 @@
 import { useState, type CSSProperties } from 'react';
 import { formatDates } from '../game/dates';
 import { RARITIES } from '../game/rarity';
-import type { CardData, Serial, VariantId } from '../game/types';
+import type { CardData, Finish, Look, Serial } from '../game/types';
 import { useTilt } from './useTilt';
 
 export interface CardProps {
   card: CardData;
-  variant: VariantId;
+  look: Look;
   serial?: Serial;
   /** Short side in px (width of a portrait card, height of a landscape one). */
   width?: number;
@@ -20,16 +20,16 @@ export interface CardProps {
 
 export const isLandscape = (card: CardData) => card.k === 'e';
 
-const FULL_LAYOUT: VariantId[] = ['fullart', 'altart'];
-const ART_SHINE: VariantId[] = ['holo', 'signed', 'fullart', 'altart', 'rainbow'];
-const FRAME_SHINE: VariantId[] = ['etched', 'gold', 'rainbow'];
-const SPARKLES: VariantId[] = ['fullart', 'altart', 'signed', 'gold', 'rainbow'];
-const CORNERS: VariantId[] = ['gold', 'altart', 'signed'];
-const SWEEP: VariantId[] = ['bw', 'gold', 'fullart', 'altart', 'etched'];
+// Which effect layers each finish uses.
+const ART_FILM: Finish[] = ['holo', 'rainbow', 'starlight'];
+const THEMED: Finish[] = ['cosmos', 'shattered', 'cold'];
+const CARD_SHINE: Finish[] = ['etched', 'gold', 'rainbow', 'ghost'];
+const SPARKLES: Finish[] = ['gold', 'cosmos', 'starlight'];
+const SWEEP: Finish[] = ['gold', 'etched', 'ghost'];
 
 export function Card({
   card,
-  variant,
+  look,
   serial,
   width = 280,
   interactive = true,
@@ -40,20 +40,21 @@ export function Card({
 }: CardProps) {
   const ref = useTilt<HTMLDivElement>(interactive);
   const rarity = RARITIES[card.r];
+  const { finish, full = false, special } = look;
   const oneOfOne = serial?.of === 1;
   // Landscape cards stay portrait while face down so the reveal keeps its surprise.
   const landscape = isLandscape(card) && !faceDown;
   const mask = card.m ? `url(${import.meta.env.BASE_URL}masks/${card.id}.png)` : undefined;
-  const full = FULL_LAYOUT.includes(variant);
   // Alternate art uses the article's second image, or a re-framed crop of the main one.
-  const sources = variant === 'altart' ? [card.alt, card.img] : [card.img];
+  const sources = special === 'altart' ? [card.alt, card.img] : [card.img];
   const classes = [
     'card',
     landscape ? 'is-landscape' : 'is-portrait',
     `r-${rarity.key}`,
-    `v-${variant}`,
+    `f-${finish}`,
     full ? 'is-full' : '',
-    variant === 'altart' && !card.alt ? 'alt-crop' : '',
+    special ? `s-${special}` : '',
+    special === 'altart' && !card.alt ? 'alt-crop' : '',
     serial ? 'is-numbered' : '',
     oneOfOne ? 'is-oneofone' : '',
     faceDown ? 'is-down' : '',
@@ -68,6 +69,10 @@ export function Card({
     height: landscape ? width : width * 1.4,
   } as CSSProperties;
 
+  const sparkles = SPARKLES.includes(finish) || full || special === 'goldsil' || oneOfOne;
+  const sweep = SWEEP.includes(finish) || special === 'blacklabel' || oneOfOne;
+  const corners = finish === 'gold' || special === 'signed' || special === 'altart' || oneOfOne;
+
   return (
     <div ref={ref} className={classes} style={style} onClick={onClick}>
       <div className="card__rotator">
@@ -75,17 +80,17 @@ export function Card({
           <div className="card__face card__front">
             <div className="card__bg" />
             <div className="card__line" />
-            {FRAME_SHINE.includes(variant) && <div className="fx fx--frameshine" />}
+            {CARD_SHINE.includes(finish) && <div className="fx fx--frameshine" />}
             <div className="card__layout">
               <div className="card__frame">
                 <div className="card__art">
                   <CardArt sources={sources} name={card.t} />
-                  {variant === 'signed' && card.sig && (
+                  {special === 'signed' && card.sig && (
                     <img className="card__sig" src={card.sig} alt="" draggable={false} />
                   )}
-                  {ART_SHINE.includes(variant) && <div className="fx fx--artshine" />}
-                  {variant === 'bgholo' && <div className="fx fx--bgholo" />}
-                  {variant === 'goldsil' && (
+                  {(ART_FILM.includes(finish) || (full && finish === 'normal')) && <div className="fx fx--artshine" />}
+                  {THEMED.includes(finish) && <div className={`fx fx--theme fx--${finish}`} />}
+                  {special === 'goldsil' && (
                     <>
                       <div className="fx fx--goldsil" />
                       <div className="fx fx--goldsil-shine" />
@@ -93,7 +98,6 @@ export function Card({
                   )}
                   {landscape && (
                     <div className="card__top">
-                      <span className="card__brand">HISTORIA</span>
                       <RarityMark rarity={card.r} chip />
                     </div>
                   )}
@@ -118,14 +122,15 @@ export function Card({
                   {!landscape && <RarityMark rarity={card.r} />}
                 </div>
                 <div className="card__desc">{card.d}</div>
-                <Timeline card={card} />
+                <CardMeta card={card} />
               </div>
             </div>
-            {variant === 'etched' && <div className="fx fx--etch" />}
-            {variant === 'rainbow' && <div className="fx fx--rainbow" />}
-            {(SPARKLES.includes(variant) || oneOfOne) && <div className="fx fx--sparkle" />}
-            {(SWEEP.includes(variant) || oneOfOne) && <div className="fx fx--sweep" />}
-            {(CORNERS.includes(variant) || oneOfOne) && <div className="fx fx--corners" />}
+            {finish === 'etched' && <div className="fx fx--etch" />}
+            {finish === 'rainbow' && <div className="fx fx--rainbow" />}
+            {finish === 'starlight' && <div className="fx fx--starlight" />}
+            {sparkles && <div className="fx fx--sparkle" />}
+            {sweep && <div className="fx fx--sweep" />}
+            {corners && <div className="fx fx--corners" />}
             <div className="fx fx--glare" />
           </div>
           <div className="card__face card__back">
@@ -146,7 +151,7 @@ function nameSize(t: string): string {
 }
 
 /** Dates and collector number under the description. */
-function Timeline({ card }: { card: CardData }) {
+function CardMeta({ card }: { card: CardData }) {
   const dates = formatDates(card);
   return (
     <div className="card__meta">
@@ -190,10 +195,10 @@ function RarityMark({ rarity, chip = false }: { rarity: number; chip?: boolean }
   );
 }
 
-export function RarityBadge({ rarity, gem = false, className = '' }: { rarity: number; gem?: boolean; className?: string }) {
+export function RarityBadge({ rarity, className = '' }: { rarity: number; className?: string }) {
   const r = RARITIES[rarity];
   return (
-    <span className={`rbadge rb-${r.key} ${gem ? 'rbadge--gem' : ''} ${className}`} title={r.label}>
+    <span className={`rbadge rb-${r.key} ${className}`} title={r.label}>
       <span>{r.short}</span>
     </span>
   );

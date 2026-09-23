@@ -1,6 +1,6 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { RARITIES } from '../game/rarity';
-import { VARIANT_ORDER } from '../game/variants';
+import { lookRank } from '../game/variants';
 import type { Entry, SaveData } from '../game/storage';
 import type { CardData, Rarity } from '../game/types';
 import { Card, RarityBadge } from './Card';
@@ -40,7 +40,7 @@ export function Binder({ cards, byId, save, testMode }: Props) {
       total: cards.filter((c) => c.r === r.id).length,
       owned: cards.filter((c) => c.r === r.id && ownedIds.has(c.id)).length,
     }));
-    const specials = entries.filter((e) => e.variant !== 'normal' || e.serial).length;
+    const specials = entries.filter((e) => e.finish !== 'normal' || e.full || e.special || e.serial).length;
     const copies = entries.reduce((s, e) => s + e.count, 0);
     return { perRarity, specials, copies };
   }, [cards, entries, ownedIds]);
@@ -52,9 +52,9 @@ export function Binder({ cards, byId, save, testMode }: Props) {
   const visibleEntries = useMemo(() => {
     const list = entries.filter((e) => {
       const c = byId.get(e.id)!;
-      return matchCard(c) && (!specialOnly || e.variant !== 'normal' || e.serial);
+      return matchCard(c) && (!specialOnly || e.finish !== 'normal' || e.full || e.special || e.serial);
     });
-    const variantRank = (e: Entry) => VARIANT_ORDER.indexOf(e.variant) + (e.serial ? 20 - Math.log10(e.serial.of) : 0);
+    const variantRank = (e: Entry) => lookRank(e) + (e.serial ? 100 - Math.log10(e.serial.of) : 0);
     list.sort((a, b) => {
       const ca = byId.get(a.id)!;
       const cb = byId.get(b.id)!;
@@ -137,8 +137,8 @@ export function Binder({ cards, byId, save, testMode }: Props) {
         {visibleEntries.map((e) => {
           const c = byId.get(e.id)!;
           return (
-            <div key={`${e.id}|${e.variant}|${e.serial?.num ?? ''}`} className="grid__item" onClick={() => setSelected({ card: c, entry: e })}>
-              <Card card={c} variant={e.variant} serial={e.serial} width={188} />
+            <div key={`${e.id}|${e.finish}|${e.full ?? ''}|${e.special ?? ''}|${e.serial?.num ?? ''}`} className="grid__item" onClick={() => setSelected({ card: c, entry: e })}>
+              <Card card={c} look={e} serial={e.serial} width={188} />
               {e.count > 1 && <span className="badge-count">×{e.count}</span>}
             </div>
           );
@@ -157,7 +157,7 @@ export function Binder({ cards, byId, save, testMode }: Props) {
       {selected && (
         <CardModal
           card={selected.card}
-          variant={selected.entry?.variant ?? 'normal'}
+          look={selected.entry ?? { finish: 'normal' }}
           serial={selected.entry?.serial}
           entry={selected.entry}
           onClose={() => setSelected(null)}

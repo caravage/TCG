@@ -1,24 +1,25 @@
 import { RARITIES } from '../game/rarity';
-import { VARIANT_BY_ID } from '../game/variants';
+import { FINISH_BY_ID, FULL_ART, SPECIAL_BY_ID } from '../game/variants';
 import type { Entry } from '../game/storage';
-import type { CardData, Serial, VariantId } from '../game/types';
+import type { CardData, Look, Serial } from '../game/types';
 import { Card, RarityBadge } from './Card';
 
 interface Props {
   card: CardData;
-  variant: VariantId;
+  look: Look;
   serial?: Serial;
   entry?: Entry;
   onClose: () => void;
 }
 
 /** Card sheet: the only place where the special effect is named. */
-export function CardModal({ card, variant, serial, entry, onClose }: Props) {
-  const v = VARIANT_BY_ID[variant];
+export function CardModal({ card, look, serial, entry, onClose }: Props) {
+  const finish = FINISH_BY_ID[look.finish];
+  const special = look.special ? SPECIAL_BY_ID[look.special] : null;
   return (
     <div className="modal" onClick={onClose}>
       <div className="modal__body" onClick={(e) => e.stopPropagation()}>
-        <Card card={card} variant={variant} serial={serial} width={380} />
+        <Card card={card} look={look} serial={serial} width={380} />
         <div className="modal__info">
           <div className="modal__no">Nº {String(card.n).padStart(4, '0')}</div>
           <h2>{card.t}</h2>
@@ -29,17 +30,29 @@ export function CardModal({ card, variant, serial, entry, onClose }: Props) {
               <RarityBadge rarity={card.r} />
               {RARITIES[card.r].label}
             </dd>
-            <dt>Effet</dt>
+            <dt>Finition</dt>
             <dd>
-              {variant === 'normal' ? (
-                'Aucun'
-              ) : (
-                <>
-                  <span className="modal__effect">{v.label}</span>
-                  {v.blurb && <small> — {v.blurb}</small>}
-                </>
-              )}
+              <span className="modal__effect">{finish.label}</span>
+              <small> — {finish.blurb}</small>
             </dd>
+            {look.full && (
+              <>
+                <dt>Format</dt>
+                <dd>
+                  <span className="modal__effect">{FULL_ART.label}</span>
+                  <small> — {FULL_ART.blurb}</small>
+                </dd>
+              </>
+            )}
+            {special && (
+              <>
+                <dt>Variante</dt>
+                <dd>
+                  <span className="modal__effect">{special.label}</span>
+                  <small> — {special.blurb}</small>
+                </dd>
+              </>
+            )}
             {serial && (
               <>
                 <dt>Numérotation</dt>
