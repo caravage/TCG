@@ -59,11 +59,11 @@ export function App() {
 
   const canOpen = testMode || save.stock > 0;
 
-  /** Consumes a pack and records its cards (normal mode only). */
+  /** Consumes packs and records their cards (normal mode only). */
   const commitPack = useCallback(
-    (pulls: Pull[]): Pull[] => {
+    (pulls: Pull[], packs = 1): Pull[] => {
       if (testMode) return markNewAgainst(save, pulls);
-      const res = addPulls({ ...save, stock: Math.max(0, save.stock - 1) }, pulls);
+      const res = addPulls({ ...save, stock: Math.max(0, save.stock - packs) }, pulls, packs);
       setSave(res.save);
       writeSave(res.save);
       return res.pulls;

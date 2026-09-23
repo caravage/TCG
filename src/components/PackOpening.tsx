@@ -4,6 +4,7 @@ import { RARITIES } from '../game/rarity';
 import { FINISH_BY_ID, FULL_ART, SPECIAL_BY_ID } from '../game/variants';
 import type { Pack, Pull } from '../game/types';
 import { Card, cardImages, isLandscape } from './Card';
+import { BulkOpening } from './BulkOpening';
 import { CardModal } from './CardModal';
 import { PackVisual } from './PackVisual';
 import { PALETTES, burst } from './particles';
@@ -13,11 +14,15 @@ interface Props {
   canOpen: boolean;
   testMode: boolean;
   stock: number;
-  onCommit: (pulls: Pull[]) => Pull[];
+  onCommit: (pulls: Pull[], packs?: number) => Pull[];
   onGoBinder: () => void;
 }
 
-type Phase = 'idle' | 'burst' | 'reveal' | 'summary';
+type Phase = 'idle' | 'burst' | 'reveal' | 'summary' | 'bulk';
+
+/** Packs opened at once by « Tout ouvrir » (keeps the page light). */
+const BULK_MAX = 50;
+const TEST_BULK = 10;
 
 const RARITY_GLOW = ['#d9d5cb', '#2e9e6b', '#2f6fd6', '#8a4be0', '#e8741a', '#d6243a'];
 
@@ -50,6 +55,7 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
   const [leaving, setLeaving] = useState(false);
   const [flash, setFlash] = useState(0);
   const [sheet, setSheet] = useState<Pull | null>(null);
+  const [bulk, setBulk] = useState<{ pulls: Pull[]; packs: number; gods: number } | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const busy = useRef(false);
 
@@ -147,6 +153,21 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
     setPhase('idle');
   };
 
+  const bulkCount = testMode ? TEST_BULK : Math.min(stock, BULK_MAX);
+
+  const openAll = () => {
+    const packs = Array.from({ length: bulkCount - 1 }, () => openPack(pools));
+    packs.unshift(pack); // the pack on screen is part of the batch
+    const pulls = onCommit(packs.flatMap((p) => p.pulls), packs.length);
+    setBulk({ pulls, packs: packs.length, gods: packs.filter((p) => p.god).length });
+    setPhase('bulk');
+  };
+
+  const leaveBulk = () => {
+    setBulk(null);
+    newPack();
+  };
+
   const skipAll = () => {
     busy.current = false;
     setCharging(false);
@@ -177,6 +198,11 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
                   <span className="hint-gesture" />
                   Glisse sur le haut du paquet pour le déchirer
                   {!testMode && <small>{stock} paquet{stock > 1 ? 's' : ''} en réserve</small>}
+                  {bulkCount >= 2 && (
+                    <button className="btn btn--ghost opening__all" onClick={openAll}>
+                      Tout ouvrir ({bulkCount} paquets)
+                    </button>
+                  )}
                 </>
               ) : (
                 <>Plus de paquet en réserve — le prochain arrive bientôt.</>
@@ -231,6 +257,18 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
             </button>
           </div>
         </div>
+      )}
+
+      {phase === 'bulk' && bulk && (
+        <BulkOpening
+          pulls={bulk.pulls}
+          packs={bulk.packs}
+          godPacks={bulk.gods}
+          particleColors={particleColors}
+          canOpenMore={canOpen}
+          onAgain={leaveBulk}
+          onGoBinder={onGoBinder}
+        />
       )}
 
       {phase === 'summary' && (

@@ -90,7 +90,7 @@ export function msUntilNext(s: SaveData, now = Date.now()): number {
 }
 
 /** Adds pulls to the collection and flags the ones never seen before. */
-export function addPulls(s: SaveData, pulls: Pull[], now = Date.now()): { save: SaveData; pulls: Pull[] } {
+export function addPulls(s: SaveData, pulls: Pull[], packs = 1, now = Date.now()): { save: SaveData; pulls: Pull[] } {
   const collection = { ...s.collection };
   const marked = pulls.map((p) => {
     const key = entryKey(p.card.id, p, p.serial);
@@ -101,9 +101,15 @@ export function addPulls(s: SaveData, pulls: Pull[], now = Date.now()): { save: 
       : { id: p.card.id, ...look, serial: p.serial, count: 1, first: now, last: now };
     return { ...p, isNew: !prev };
   });
-  return { save: { ...s, collection, opened: s.opened + 1 }, pulls: marked };
+  return { save: { ...s, collection, opened: s.opened + packs }, pulls: marked };
 }
 
 export function markNewAgainst(s: SaveData, pulls: Pull[]): Pull[] {
-  return pulls.map((p) => ({ ...p, isNew: !s.collection[entryKey(p.card.id, p, p.serial)] }));
+  const seen = new Set<string>();
+  return pulls.map((p) => {
+    const key = entryKey(p.card.id, p, p.serial);
+    const isNew = !s.collection[key] && !seen.has(key);
+    seen.add(key);
+    return { ...p, isNew };
+  });
 }
