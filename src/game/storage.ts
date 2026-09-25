@@ -1,3 +1,4 @@
+import { WELCOME_PARCHMENTS } from './recycle';
 import type { Finish, Look, Pull, Serial } from './types';
 
 export const PACK_INTERVAL_MS = 15 * 60 * 1000;
@@ -18,6 +19,8 @@ export interface SaveData {
   opened: number;
   /** Parchemins earned by recycling cards, spent on packs. */
   parchments: number;
+  /** Welcome parchemins already granted. */
+  welcomed?: boolean;
   collection: Record<string, Entry>;
 }
 
@@ -52,11 +55,12 @@ function migrate(s: SaveData): SaveData {
     const prev = collection[key];
     collection[key] = prev ? { ...prev, count: prev.count + e.count, first: Math.min(prev.first, e.first) } : e;
   }
-  return { ...s, parchments: s.parchments ?? 0, collection };
+  const welcome = s.welcomed ? 0 : WELCOME_PARCHMENTS;
+  return { ...s, parchments: (s.parchments ?? 0) + welcome, welcomed: true, collection };
 }
 
 export function freshSave(now = Date.now()): SaveData {
-  return { stock: 1, lastAccrual: now, opened: 0, parchments: 0, collection: {} };
+  return { stock: 1, lastAccrual: now, opened: 0, parchments: WELCOME_PARCHMENTS, welcomed: true, collection: {} };
 }
 
 export function loadSave(): SaveData {

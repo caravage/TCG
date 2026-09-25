@@ -44,7 +44,7 @@ export const PALETTES = {
   common: ['#d9d5cb', '#ffffff'],
   uncommon: ['#2e9e6b', '#8fe0b8', '#ffffff'],
   rare: ['#2f6fd6', '#9cc0ff', '#ffffff'],
-  epic: ['#8a4be0', '#cbb0ff', '#ffffff'],
+  ultra: ['#8a4be0', '#cbb0ff', '#ffffff'],
   legendary: ['#e8741a', '#ffc08a', '#ffe0b8', '#ffffff'],
   mythic: ['#d6243a', '#ff7a8a', '#ffd0d6', '#ffffff', '#ffd36b'],
   gold: ['#ffd766', '#fff1b8', '#e0a800', '#fffbe6'],

@@ -104,7 +104,7 @@
 .card.r-rare {
   --rc: #2f6fd6;
 }
-.card.r-epic {
+.card.r-ultra {
   --rc: #8a4be0;
 }
 .card.r-legendary {
@@ -299,7 +299,7 @@
 .rb-rare {
   background: #2f6fd6;
 }
-.rb-epic {
+.rb-ultra {
   background: #8a4be0;
 }
 .rb-legendary {

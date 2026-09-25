@@ -115,7 +115,7 @@ export function Showcase({ cards }: { cards: CardData[] }) {
           <Item
             key={s.of}
             card={pick(3)}
-            look={{ finish: s.of === 1 ? 'gold' : 'holo' }}
+            look={{ finish: 'holo' }}
             serial={{ of: s.of, num: Math.ceil(s.of / 3) }}
             label={`/${s.of}`}
             sub={pct(s.chance)}

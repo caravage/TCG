@@ -30,12 +30,12 @@ const DEATH_YEAR_MAX = 2000;
 
 // Keep in sync with src/game/rarity.ts (shares of the corpus, rarest first).
 const TIERS = [
-  { r: 5, share: 0.003 },
-  { r: 4, share: 0.012 },
-  { r: 3, share: 0.045 },
-  { r: 2, share: 0.11 },
+  { r: 5, share: 0.01 },
+  { r: 4, share: 0.03 },
+  { r: 3, share: 0.09 },
+  { r: 2, share: 0.22 },
   { r: 1, share: 0.25 },
-  { r: 0, share: 0.58 },
+  { r: 0, share: 0.4 },
 ];
 
 mkdirSync(CACHE, { recursive: true });

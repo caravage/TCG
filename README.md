@@ -46,22 +46,22 @@ commite le résultat. On peut la relancer à la main depuis l'onglet *Actions*.
 
 ### Raretés (plus consulté = plus rare, en percentiles)
 
-| Rareté (sigle) | Part du corpus | ≈ sur 3 000 |
-|-------------|---------------:|------------:|
-| Commune (C) | 58 %   | 1 740 |
-| Peu commune (UC) | 25 %   | 750 |
-| Rare (R) | 11 %   | 330 |
-| Ultra Rare (UR) | 4,5 %  | 135 |
-| Légendaire (L) | 1,2 %  | 36 |
-| Mythique (M) | 0,3 %  | 9 |
+| Rareté (sigle) | Part du corpus | ≈ sur 3 000 | Paquets pour trouver **une carte précise** |
+|---|---:|---:|---:|
+| Commune (C) | 40 % | 1 200 | ~255 |
+| Peu commune (UC) | 25 % | 750 | ~650 |
+| Rare (R) | 22 % | 660 | ~690 |
+| Ultra Rare (UR) | 9 % | 270 | ~1 800 |
+| Légendaire (L) | 3 % | 90 | ~3 000 |
+| Mythique (M) | 1 % | 30 | ~5 300 |
 
 ### Paquet de 7 cartes
 
 | Emplacement | Tirage |
 |---|---|
 | 1 à 5 | Commune 94 % · Peu commune 6 % |
-| 6 | Peu commune 84 % · Rare 12 % · Ultra Rare 3,2 % · Légendaire 0,8 % |
-| 7 (rare garantie) | Rare 78 % · Ultra Rare 17 % · Légendaire 4 % · Mythique 1 % |
+| 6 | Peu commune 86 % · Rare 11,5 % · Ultra Rare 2 % · Légendaire 0,45 % · Mythique 0,05 % |
+| 7 (rare garantie) | Rare 84 % · Ultra Rare 13 % · Légendaire 2,5 % · Mythique 0,5 % |
 | **God pack** (1 / 1 500) | 7 cartes Rare+ : Rare 55 % · Ultra Rare 30 % · Légendaire 12 % · Mythique 3 % |
 
 ### Finitions (selon la rareté)
@@ -73,7 +73,7 @@ Chaque carte reçoit une finition, tirée selon sa rareté (poids C / UC / R / U
 | Mat | sans reflet | C → R |
 | Reverse Holo | le fond de la carte brille, l’illustration reste mate (3,5 %) | C → R |
 | Holo | film arc-en-ciel sur l’illustration | R → M |
-| Cosmos · Verre brisé · Cold Foil | foils thématiques : étoiles, éclats, ondes | R → M |
+| Foil thématique : Cosmos · Verre brisé · Cold Foil | un seul palier, motif tiré au hasard (étoiles, éclats, ondes) | R → M |
 | Gravé | micro-relief granuleux et doré | UR → M |
 | Gold · Rainbow · Ghost · Starlight | finitions extrêmes | UR → M |
 
@@ -81,14 +81,17 @@ Les poids exacts sont dans `src/game/variants.ts` ; l’onglet *Effets* (mode te
 
 **Full Art** (1 / 60, dès UC) se combine avec n’importe quelle finition.
 
-### Variantes spéciales (au plus une par carte)
+### Variantes spéciales (au plus une par carte, Rare et plus)
 
 | Variante | Chance |
 |---|---|
+| Black Label (carte noire brillante) | 1 / 1 000 |
+| Alternate Art | 1 / 1 500 |
+| Silhouette dorée (portraits détourés) | 1 / 2 000 |
 | Signée (si la page a une signature ; toujours numérotée) | 1 / 3 000 |
-| Silhouette dorée (portraits détourés) | 1 / 500 |
-| Alternate Art | 1 / 1 000 |
-| Black Label (carte noire brillante) | 1 / 1 500 |
+
+Combinaisons incompatibles corrigées au tirage : Reverse + Full Art → Mat ; Black Label + Gold/Ghost/Rainbow → Holo ;
+Silhouette dorée + Gold → Holo.
 
 ### Numérotées (cumulables avec une variante)
 
@@ -116,10 +119,11 @@ Les cartes se recyclent en **parchemins** (atelier dans l'en-tête, ou fiche de 
 
 Multiplicateurs : Reverse ×1,5 · Holo ×2 · Cosmos/Verre brisé/Cold ×3 · Gravé ×4 ·
 Gold/Rainbow/Ghost/Starlight ×15 · Full Art ×3 · Black Label/Alternate Art/Silhouette dorée ×10 ·
-Signée ×20 · numérotée /100 ×10, /50 ×20, /10 ×50, 1/1 ×200.
+Signée ×20 (×100 si 1/1, sa numérotation ne se cumule pas) · numérotée /100 ×10, /50 ×20, /10 ×50, 1/1 ×200.
 
-**Un paquet coûte 100 parchemins** — la valeur moyenne d'un paquet entièrement recyclé
-(~98, tirée par les hits ; un paquet sans hit vaut ~20).
+**Un paquet coûte 100 parchemins**, au-dessus de la valeur moyenne d'un paquet entièrement recyclé
+(~70, tirée par les hits ; ~20 sans hit) pour que le recyclage ne s'auto-alimente pas.
+Chaque joueur reçoit **200 parchemins de bienvenue**.
 
 ## Structure
 

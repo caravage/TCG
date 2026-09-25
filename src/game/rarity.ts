@@ -6,17 +6,20 @@ export interface RarityInfo {
   label: string;
   /** Initials shown on the card. */
   short: string;
-  /** Share of the corpus in this tier (by page-view percentile, most viewed = rarest). */
+  /**
+   * Share of the corpus in this tier (by page-view percentile, most viewed = rarest). Sized with
+   * the slot odds so that one specific card gets harder to find at every step up.
+   */
   share: number;
 }
 
 export const RARITIES: RarityInfo[] = [
-  { id: 0, key: 'common', label: 'Commune', short: 'C', share: 0.58 },
+  { id: 0, key: 'common', label: 'Commune', short: 'C', share: 0.4 },
   { id: 1, key: 'uncommon', label: 'Peu commune', short: 'UC', share: 0.25 },
-  { id: 2, key: 'rare', label: 'Rare', short: 'R', share: 0.11 },
-  { id: 3, key: 'epic', label: 'Ultra Rare', short: 'UR', share: 0.045 },
-  { id: 4, key: 'legendary', label: 'Légendaire', short: 'L', share: 0.012 },
-  { id: 5, key: 'mythic', label: 'Mythique', short: 'M', share: 0.003 },
+  { id: 2, key: 'rare', label: 'Rare', short: 'R', share: 0.22 },
+  { id: 3, key: 'ultra', label: 'Ultra Rare', short: 'UR', share: 0.09 },
+  { id: 4, key: 'legendary', label: 'Légendaire', short: 'L', share: 0.03 },
+  { id: 5, key: 'mythic', label: 'Mythique', short: 'M', share: 0.01 },
 ];
 
 type Odds = [Rarity, number][];
@@ -30,17 +33,18 @@ export const SLOT_ODDS: Record<'common' | 'uncommon' | 'rare' | 'god', Odds> = {
   ],
   // Slot 6
   uncommon: [
-    [1, 0.84],
-    [2, 0.12],
-    [3, 0.032],
-    [4, 0.008],
+    [1, 0.86],
+    [2, 0.115],
+    [3, 0.02],
+    [4, 0.0045],
+    [5, 0.0005],
   ],
   // Slot 7, rare guaranteed
   rare: [
-    [2, 0.78],
-    [3, 0.17],
-    [4, 0.04],
-    [5, 0.01],
+    [2, 0.84],
+    [3, 0.13],
+    [4, 0.025],
+    [5, 0.005],
   ],
   // Every slot of a god pack
   god: [

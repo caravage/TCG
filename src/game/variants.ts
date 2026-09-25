@@ -14,17 +14,21 @@ export interface FinishInfo {
   blurb: string;
   /** Suspense / particle level (0-3). */
   hit: number;
-  /** Weight per rarity, C → M (0 = not available at that rarity). */
+  /** Weight per rarity, C → M (0 = not available at that rarity). Themed foils share one row. */
   weights: [number, number, number, number, number, number];
 }
+
+/** The three themed foils are one tier of the pyramid with three looks, picked at random. */
+export const THEMED_FOILS: Finish[] = ['cosmos', 'shattered', 'cold'];
+const THEMED_WEIGHTS: FinishInfo['weights'] = [0, 0, 5, 27, 30, 30];
 
 export const FINISHES: FinishInfo[] = [
   { id: 'normal', label: 'Mat', blurb: 'Finition mate, sans reflet.', hit: 0, weights: [96.5, 96.5, 82.5, 0, 0, 0] },
   { id: 'reverse', label: 'Reverse Holo', blurb: 'Le fond de la carte brille, l’illustration reste mate.', hit: 0, weights: [3.5, 3.5, 3.5, 0, 0, 0] },
   { id: 'holo', label: 'Holo', blurb: 'L’illustration est couverte d’un film arc-en-ciel.', hit: 0, weights: [0, 0, 9, 58, 50, 44] },
-  { id: 'cosmos', label: 'Cosmos', blurb: 'Foil étoilé : une nuée d’étoiles dans le reflet.', hit: 1, weights: [0, 0, 1.7, 9, 10, 10] },
-  { id: 'shattered', label: 'Verre brisé', blurb: 'Foil à éclats de verre qui accrochent la lumière.', hit: 1, weights: [0, 0, 1.7, 9, 10, 10] },
-  { id: 'cold', label: 'Cold Foil', blurb: 'Foil argenté à ondes concentriques.', hit: 1, weights: [0, 0, 1.6, 9, 10, 10] },
+  { id: 'cosmos', label: 'Cosmos', blurb: 'Foil étoilé : une nuée d’étoiles dans le reflet.', hit: 1, weights: THEMED_WEIGHTS },
+  { id: 'shattered', label: 'Verre brisé', blurb: 'Foil à éclats de verre qui accrochent la lumière.', hit: 1, weights: THEMED_WEIGHTS },
+  { id: 'cold', label: 'Cold Foil', blurb: 'Foil argenté à ondes concentriques.', hit: 1, weights: THEMED_WEIGHTS },
   { id: 'etched', label: 'Gravé', blurb: 'Micro-relief granuleux et doré qui capte la lumière.', hit: 1, weights: [0, 0, 0, 12, 14, 16] },
   { id: 'gold', label: 'Gold', blurb: 'Entièrement dorée.', hit: 3, weights: [0, 0, 0, 1.2, 2, 3] },
   { id: 'rainbow', label: 'Rainbow', blurb: 'Reflets iridescents multicolores intenses.', hit: 3, weights: [0, 0, 0, 0.9, 1.6, 2.6] },
@@ -42,41 +46,56 @@ export interface SpecialInfo {
   hit: number;
 }
 
-/** Rolled in this order; the first hit wins. */
+/** Rolled rarest first; the first hit wins. All specials are for Rare and above. */
 export const SPECIALS: SpecialInfo[] = [
   { id: 'signed', label: 'Signée', blurb: 'Porte la signature du personnage. Toujours numérotée.', chance: 1 / 3000, hit: 2 },
-  { id: 'goldsil', label: 'Silhouette dorée', blurb: 'Le personnage est frappé à la feuille d’or.', chance: 1 / 500, hit: 2 },
-  { id: 'altart', label: 'Alternate Art', blurb: 'Illustration alternative, cadre orné.', chance: 1 / 1000, hit: 2 },
-  { id: 'blacklabel', label: 'Black Label', blurb: 'Carte noire brillante.', chance: 1 / 1500, hit: 2 },
+  { id: 'goldsil', label: 'Silhouette dorée', blurb: 'Le personnage est frappé à la feuille d’or.', chance: 1 / 2000, hit: 2 },
+  { id: 'altart', label: 'Alternate Art', blurb: 'Illustration alternative, cadre orné.', chance: 1 / 1500, hit: 2 },
+  { id: 'blacklabel', label: 'Black Label', blurb: 'Carte noire brillante.', chance: 1 / 1000, hit: 2 },
 ];
 export const SPECIAL_BY_ID = Object.fromEntries(SPECIALS.map((s) => [s.id, s])) as Record<Special, SpecialInfo>;
 
-export const ALT_ART_MIN_RARITY = 2;
-export const FULL_ART = { label: 'Full Art', blurb: 'L’illustration couvre toute la carte.', chance: 1 / 60, minRarity: 1, hit: 2 };
+export const SPECIAL_MIN_RARITY = 2;
+export const FULL_ART = { label: 'Full Art', blurb: 'L’illustration couvre toute la carte.', chance: 1 / 60, minRarity: 1, hit: 1 };
 
+/** Finishes as rolled: the themed foils count once. */
+const ROLLED = FINISHES.filter((f) => !THEMED_FOILS.includes(f.id) || f.id === THEMED_FOILS[0]);
+const rowTotal = (r: Rarity) => ROLLED.reduce((s, f) => s + f.weights[r], 0);
+
+/** Chance for a card of rarity `r` to get finish `f`. */
 export function finishChance(f: Finish, r: Rarity): number {
-  const w = FINISH_BY_ID[f].weights;
-  const total = FINISHES.reduce((s, x) => s + x.weights[r], 0);
-  return w[r] / total;
+  const w = FINISH_BY_ID[f].weights[r];
+  return (THEMED_FOILS.includes(f) ? w / THEMED_FOILS.length : w) / rowTotal(r);
 }
 
 function rollFinish(card: CardData, rnd: () => number): Finish {
-  const total = FINISHES.reduce((s, f) => s + f.weights[card.r], 0);
-  let x = rnd() * total;
-  for (const f of FINISHES) {
+  let x = rnd() * rowTotal(card.r);
+  for (const f of ROLLED) {
     if (x < f.weights[card.r]) {
-      return f.id;
+      return THEMED_FOILS.includes(f.id) ? THEMED_FOILS[Math.floor(rnd() * THEMED_FOILS.length)] : f.id;
     }
     x -= f.weights[card.r];
   }
-  return FINISHES.find((f) => f.weights[card.r] > 0)!.id;
+  return ROLLED.find((f) => f.weights[card.r] > 0)!.id;
 }
 
 function specialAllowed(s: Special, card: CardData): boolean {
+  if (card.r < SPECIAL_MIN_RARITY) return false;
   if (s === 'signed') return !!card.sig;
   if (s === 'goldsil') return !!card.m;
-  if (s === 'altart') return card.r >= ALT_ART_MIN_RARITY;
   return true;
+}
+
+/** Combinations whose effects would cancel out are resolved to a sensible finish. */
+function reconcile(look: Look): Look {
+  const f = look.finish;
+  // Reverse lights up the card background, which a Full Art covers entirely.
+  if (look.full && f === 'reverse') look.finish = 'normal';
+  // Black Label paints the card black: it cannot also be gold, silver or rainbow paper.
+  if (look.special === 'blacklabel' && (f === 'gold' || f === 'ghost' || f === 'rainbow')) look.finish = 'holo';
+  // A gold silhouette would vanish on a gold card.
+  if (look.special === 'goldsil' && f === 'gold') look.finish = 'holo';
+  return look;
 }
 
 export function rollLook(card: CardData, rnd: () => number): Look {
@@ -89,7 +108,7 @@ export function rollLook(card: CardData, rnd: () => number): Look {
       break;
     }
   }
-  return { finish, ...(full ? { full } : {}), ...(special ? { special } : {}) };
+  return reconcile({ finish, ...(full ? { full } : {}), ...(special ? { special } : {}) });
 }
 
 export function lookHit(look: Look): number {
