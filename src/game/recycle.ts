@@ -13,7 +13,6 @@ const FINISH_MULT: Record<Look['finish'], number> = {
   etched: 4,
   gold: 15,
   rainbow: 15,
-  ghost: 15,
   starlight: 15,
 };
 const SPECIAL_MULT = { blacklabel: 10, altart: 10, goldsil: 10, signed: 20 } as const;

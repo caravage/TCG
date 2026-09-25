@@ -75,7 +75,7 @@ Chaque carte reçoit une finition, tirée selon sa rareté (poids C / UC / R / U
 | Holo | film arc-en-ciel sur l’illustration | R → M |
 | Foil thématique : Cosmos · Verre brisé · Cold Foil | un seul palier, motif tiré au hasard (étoiles, éclats, ondes) | R → M |
 | Gravé | micro-relief granuleux et doré | UR → M |
-| Gold · Rainbow · Ghost · Starlight | finitions extrêmes | UR → M |
+| Gold · Rainbow · Starlight | finitions extrêmes | UR → M |
 
 Les poids exacts sont dans `src/game/variants.ts` ; l’onglet *Effets* (mode test) affiche les chances.
 
@@ -90,7 +90,7 @@ Les poids exacts sont dans `src/game/variants.ts` ; l’onglet *Effets* (mode te
 | Silhouette dorée (portraits détourés) | 1 / 2 000 |
 | Signée (si la page a une signature ; toujours numérotée) | 1 / 3 000 |
 
-Combinaisons incompatibles corrigées au tirage : Reverse + Full Art → Mat ; Black Label + Gold/Ghost/Rainbow → Holo ;
+Combinaisons incompatibles corrigées au tirage : Reverse + Full Art → Mat ; Black Label + Gold/Rainbow → Holo ;
 Silhouette dorée + Gold → Holo.
 
 ### Numérotées (cumulables avec une variante)
@@ -118,7 +118,7 @@ Les cartes se recyclent en **parchemins** (atelier dans l'en-tête, ou fiche de 
 | parchemins | 1 | 3 | 10 | 40 | 150 | 600 |
 
 Multiplicateurs : Reverse ×1,5 · Holo ×2 · Cosmos/Verre brisé/Cold ×3 · Gravé ×4 ·
-Gold/Rainbow/Ghost/Starlight ×15 · Full Art ×3 · Black Label/Alternate Art/Silhouette dorée ×10 ·
+Gold/Rainbow/Starlight ×15 · Full Art ×3 · Black Label/Alternate Art/Silhouette dorée ×10 ·
 Signée ×20 (×100 si 1/1, sa numérotation ne se cumule pas) · numérotée /100 ×10, /50 ×20, /10 ×50, 1/1 ×200.
 
 **Un paquet coûte 100 parchemins**, au-dessus de la valeur moyenne d'un paquet entièrement recyclé

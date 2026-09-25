@@ -32,9 +32,9 @@ export function cardImages(card: CardData, look: Look): string[] {
 // Which effect layers each finish uses.
 const ART_FILM: Finish[] = ['holo', 'rainbow', 'starlight'];
 const THEMED: Finish[] = ['cosmos', 'shattered', 'cold'];
-const CARD_SHINE: Finish[] = ['etched', 'gold', 'rainbow', 'ghost'];
+const CARD_SHINE: Finish[] = ['etched', 'gold', 'rainbow'];
 const SPARKLES: Finish[] = ['gold', 'cosmos', 'starlight'];
-const SWEEP: Finish[] = ['gold', 'etched', 'ghost'];
+const SWEEP: Finish[] = ['gold', 'etched'];
 
 export function Card({
   card,

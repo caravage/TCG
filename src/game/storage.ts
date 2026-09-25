@@ -31,13 +31,15 @@ export function entryKey(id: string, look: Look, serial?: Serial): string {
   return parts.join('|');
 }
 
-const FINISH_IDS: Finish[] = ['normal', 'reverse', 'holo', 'cosmos', 'shattered', 'cold', 'etched', 'gold', 'rainbow', 'ghost', 'starlight'];
+const FINISH_IDS: Finish[] = ['normal', 'reverse', 'holo', 'cosmos', 'shattered', 'cold', 'etched', 'gold', 'rainbow', 'starlight'];
 
 /** Saves made before looks had three parts stored a single `variant`. */
 function migrate(s: SaveData): SaveData {
   const collection: Record<string, Entry> = {};
   for (const raw of Object.values(s.collection) as (Entry & { variant?: string })[]) {
-    let look: Look = { finish: raw.finish ?? 'normal', full: raw.full, special: raw.special };
+    // Retired finishes (Ghost) fall back to Holo.
+    const finish = raw.finish && FINISH_IDS.includes(raw.finish) ? raw.finish : raw.finish ? 'holo' : 'normal';
+    let look: Look = { finish, full: raw.full, special: raw.special };
     if (raw.variant) {
       const v = raw.variant;
       look = { finish: FINISH_IDS.includes(v as Finish) ? (v as Finish) : 'normal' };

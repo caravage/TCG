@@ -32,7 +32,6 @@ export const FINISHES: FinishInfo[] = [
   { id: 'etched', label: 'Gravé', blurb: 'Micro-relief granuleux et doré qui capte la lumière.', hit: 1, weights: [0, 0, 0, 12, 14, 16] },
   { id: 'gold', label: 'Gold', blurb: 'Entièrement dorée.', hit: 3, weights: [0, 0, 0, 1.2, 2, 3] },
   { id: 'rainbow', label: 'Rainbow', blurb: 'Reflets iridescents multicolores intenses.', hit: 3, weights: [0, 0, 0, 0.9, 1.6, 2.6] },
-  { id: 'ghost', label: 'Ghost', blurb: 'Visuel argenté, presque invisible.', hit: 3, weights: [0, 0, 0, 0.6, 1.4, 2.4] },
   { id: 'starlight', label: 'Starlight', blurb: 'Paillettes 3D scintillantes.', hit: 3, weights: [0, 0, 0, 0.3, 1, 2] },
 ];
 
@@ -91,8 +90,8 @@ function reconcile(look: Look): Look {
   const f = look.finish;
   // Reverse lights up the card background, which a Full Art covers entirely.
   if (look.full && f === 'reverse') look.finish = 'normal';
-  // Black Label paints the card black: it cannot also be gold, silver or rainbow paper.
-  if (look.special === 'blacklabel' && (f === 'gold' || f === 'ghost' || f === 'rainbow')) look.finish = 'holo';
+  // Black Label paints the card black: it cannot also be gold or rainbow paper.
+  if (look.special === 'blacklabel' && (f === 'gold' || f === 'rainbow')) look.finish = 'holo';
   // A gold silhouette would vanish on a gold card.
   if (look.special === 'goldsil' && f === 'gold') look.finish = 'holo';
   return look;

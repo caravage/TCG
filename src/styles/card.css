@@ -741,33 +741,6 @@
 }
 
 /* ---------- extreme finishes ---------- */
-/* Ghost: silvery, almost invisible picture */
-.card.f-ghost {
-  --paper: linear-gradient(160deg, #f7f8fa, #dfe3e8 50%, #f3f5f8);
-  --ink: #5d6570;
-  --muted: #8b939e;
-  --faint: #a7aeb8;
-  --rc: #9aa3ae;
-  --holo: repeating-linear-gradient(115deg, #c9d3de 0%, #ffffff 6%, #b5c0cc 12%, #f4f7fb 18%, #c9d3de 24%);
-}
-.f-ghost .card__img {
-  filter: grayscale(1) brightness(1.45) contrast(0.55);
-  opacity: 0.8;
-}
-.f-ghost .card__art {
-  background: #eef1f5;
-}
-.f-ghost .fx--frameshine {
-  mix-blend-mode: soft-light;
-  filter: none;
-  opacity: calc(0.7 + var(--hov) * 0.3);
-}
-.f-ghost .card__name {
-  background: linear-gradient(180deg, #5f6874, #97a0ab);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
 /* Starlight: dense 3D glitter over everything */
 .fx--starlight {
   z-index: 8;

@@ -54,7 +54,6 @@ export type Finish =
   | 'etched'
   | 'gold'
   | 'rainbow'
-  | 'ghost'
   | 'starlight';
 
 export type Special = 'blacklabel' | 'altart' | 'goldsil' | 'signed';
