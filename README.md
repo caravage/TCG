@@ -85,7 +85,7 @@ Les poids exacts sont dans `src/game/variants.ts` ; l’onglet *Effets* (mode te
 
 | Variante | Chance |
 |---|---|
-| Signée (si la page a une signature ; toujours numérotée) | 1 / 300 |
+| Signée (si la page a une signature ; toujours numérotée) | 1 / 3 000 |
 | Silhouette dorée (portraits détourés) | 1 / 500 |
 | Alternate Art | 1 / 1 000 |
 | Black Label (carte noire brillante) | 1 / 1 500 |

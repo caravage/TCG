@@ -44,7 +44,7 @@ export interface SpecialInfo {
 
 /** Rolled in this order; the first hit wins. */
 export const SPECIALS: SpecialInfo[] = [
-  { id: 'signed', label: 'Signée', blurb: 'Porte la signature du personnage. Toujours numérotée.', chance: 1 / 300, hit: 2 },
+  { id: 'signed', label: 'Signée', blurb: 'Porte la signature du personnage. Toujours numérotée.', chance: 1 / 3000, hit: 2 },
   { id: 'goldsil', label: 'Silhouette dorée', blurb: 'Le personnage est frappé à la feuille d’or.', chance: 1 / 500, hit: 2 },
   { id: 'altart', label: 'Alternate Art', blurb: 'Illustration alternative, cadre orné.', chance: 1 / 1000, hit: 2 },
   { id: 'blacklabel', label: 'Black Label', blurb: 'Carte noire brillante.', chance: 1 / 1500, hit: 2 },
