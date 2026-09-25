@@ -203,31 +203,35 @@ export function Binder({ cards, byId, save, testMode, duplicates, entryValue, on
       </div>
       )}
 
-      {selected && (
-        <CardModal
-          card={selected.card}
-          look={selected.entry ?? { finish: 'normal' }}
-          serial={selected.entry?.serial}
-          entry={selected.entry}
-          onClose={() => setSelected(null)}
-          recycle={
-            selected.entry && !testMode
-              ? (() => {
-                  const e = selected.entry;
-                  const key = entryKey(e.id, e, e.serial);
-                  return {
-                    value: entryValue(key),
+      {selected && (() => {
+        // Always read the entry live from the save, so recycling updates the sheet.
+        const versions = entriesById.get(selected.card.id) ?? [];
+        const key = selected.entry && entryKey(selected.entry.id, selected.entry, selected.entry.serial);
+        const e = versions.find((v) => entryKey(v.id, v, v.serial) === key) ?? versions[0];
+        return (
+          <CardModal
+            card={selected.card}
+            look={e ?? { finish: 'normal' }}
+            serial={e?.serial}
+            entry={e}
+            versions={versions}
+            onPickVersion={(v) => setSelected({ card: selected.card, entry: v })}
+            onClose={() => setSelected(null)}
+            recycle={
+              e && !testMode
+                ? {
+                    value: entryValue(entryKey(e.id, e, e.serial)),
                     count: e.count,
                     onRecycle: (n: number) => {
-                      onRecycle(key, n);
-                      setSelected(n >= e.count ? null : { ...selected, entry: { ...e, count: e.count - n } });
+                      onRecycle(entryKey(e.id, e, e.serial), n);
+                      if (n >= e.count && versions.length <= 1) setSelected(null);
                     },
-                  };
-                })()
-              : undefined
-          }
-        />
-      )}
+                  }
+                : undefined
+            }
+          />
+        );
+      })()}
     </section>
   );
 }

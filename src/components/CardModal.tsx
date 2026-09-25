@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties } from 'react';
 import { formatDates } from '../game/dates';
 import { loadExtracts } from '../game/extracts';
 import { RARITIES } from '../game/rarity';
-import { FINISH_BY_ID, FULL_ART, SPECIAL_BY_ID } from '../game/variants';
+import { FINISH_BY_ID, FULL_ART, SPECIAL_BY_ID, lookLabel, lookRank } from '../game/variants';
 import type { Entry } from '../game/storage';
 import type { CardData, Look, Serial } from '../game/types';
 import { Card, RarityBadge, isLandscape } from './Card';
@@ -15,10 +15,13 @@ interface Props {
   onClose: () => void;
   /** Recycling controls, when the card comes from the saved collection. */
   recycle?: { value: number; count: number; onRecycle: (n: number) => void };
+  /** Every owned version of this card (different looks or numbers). */
+  versions?: Entry[];
+  onPickVersion?: (e: Entry) => void;
 }
 
 /** Card sheet: the only place where the special effect is named. */
-export function CardModal({ card, look, serial, entry, onClose, recycle }: Props) {
+export function CardModal({ card, look, serial, entry, onClose, recycle, versions, onPickVersion }: Props) {
   const finish = FINISH_BY_ID[look.finish];
   const special = look.special ? SPECIAL_BY_ID[look.special] : null;
   const [flipped, setFlipped] = useState(false);
@@ -55,6 +58,30 @@ export function CardModal({ card, look, serial, entry, onClose, recycle }: Props
           </button>
         </div>
         <div className="modal__info">
+          {versions && versions.length > 1 && (
+            <div className="versions">
+              <div className="versions__title">{versions.length} versions possédées</div>
+              <div className="versions__list">
+                {[...versions]
+                  .sort((a, b) => lookRank(a) - lookRank(b))
+                  .map((v) => {
+                    const active = v === entry;
+                    return (
+                      <button
+                        key={`${v.finish}|${v.full ?? ''}|${v.special ?? ''}|${v.serial?.num ?? ''}`}
+                        className={`versions__item ${active ? 'is-active' : ''}`}
+                        onClick={() => onPickVersion?.(v)}
+                        title={lookLabel(v)}
+                      >
+                        <Card card={card} look={v} serial={v.serial} width={isLandscape(card) ? 50 : 60} interactive={false} />
+                        <span className="versions__label">{lookLabel(v)}</span>
+                        {v.count > 1 && <span className="versions__count">×{v.count}</span>}
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
           <div className="modal__no">Nº {String(card.n).padStart(4, '0')}</div>
           <h2>{card.t}</h2>
           <p className="modal__desc">{card.d}</p>

@@ -998,3 +998,61 @@ select {
 .shop__close {
   align-self: flex-end;
 }
+
+/* ---------- owned versions in the card sheet ---------- */
+.versions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.versions__title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.versions__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.versions__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 78px;
+  padding: 7px 4px 6px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--panel);
+  cursor: pointer;
+}
+.versions__item:hover {
+  border-color: var(--line);
+}
+.versions__item.is-active {
+  border-color: var(--gold-2);
+  box-shadow: 0 0 14px rgb(230 201 132 / 0.3);
+}
+.versions__label {
+  font-size: 9.5px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--muted);
+}
+.versions__item.is-active .versions__label {
+  color: var(--gold);
+}
+.versions__count {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gold);
+}
