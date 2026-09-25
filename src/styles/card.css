@@ -438,26 +438,17 @@
   mix-blend-mode: multiply;
   opacity: calc(0.35 + var(--hov) * 0.3);
 }
-/* Holo: iridescent rim around the art */
-.f-holo .card__art {
-  box-shadow:
-    0 0 0 0.8cqmin #fff,
-    0 0 4cqmin rgb(150 210 255 / 0.8);
-  animation: hue-spin 3s linear infinite;
+/* Holo: iridescent rim around the art (its own layer, so the picture keeps its colours) */
+.f-holo .card__frame::before {
+  content: '';
+  position: absolute;
+  inset: -0.8cqmin;
+  border-radius: 2.2cqmin;
+  background: conic-gradient(from var(--angle), #ff9a9a, #ffe28a, #9dffb0, #8ae4ff, #b8a2ff, #ff9be9, #ff9a9a);
+  box-shadow: 0 0 4cqmin rgb(150 210 255 / 0.6);
+  animation: spin-angle 3s linear infinite;
 }
-@keyframes hue-spin {
-  to {
-    filter: hue-rotate(360deg);
-  }
-}
-.f-holo .card__img {
-  animation: hue-spin-back 3s linear infinite;
-}
-@keyframes hue-spin-back {
-  to {
-    filter: hue-rotate(-360deg);
-  }
-}
+
 
 /* Black Label: glossy black card, silver type */
 .card.s-blacklabel {
@@ -827,10 +818,18 @@
 /* Silhouette dorée: the subject is gold leaf */
 .fx--goldsil {
   z-index: 5;
-  background: linear-gradient(135deg, #fff3c4, #d9a52a 30%, #8a6212 55%, #f6d573 80%, #b8860b);
-  mix-blend-mode: color;
   -webkit-mask-image: var(--mask);
   mask-image: var(--mask);
+}
+/* A gold-leaf copy of the picture, cut to the subject: independent of the finish below. */
+.fx--goldsil img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--fx) var(--fy);
+  filter: grayscale(1) sepia(1) saturate(3.4) hue-rotate(-12deg) brightness(1.12) contrast(1.3);
 }
 .fx--goldsil-shine {
   z-index: 6;

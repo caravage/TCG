@@ -53,7 +53,9 @@ export function Card({
   const oneOfOne = serial?.of === 1;
   // Landscape cards stay portrait while face down so the reveal keeps its surprise.
   const landscape = isLandscape(card) && !faceDown;
-  const mask = card.m ? `url(${import.meta.env.BASE_URL}masks/${card.id}.png)` : undefined;
+  // Absolute URL: a relative url() inside a CSS variable resolves against the stylesheet
+  // (assets/…), not the page, and the mask would never load on the published site.
+  const mask = card.m ? `url("${new URL(`${import.meta.env.BASE_URL}masks/${card.id}.png`, document.baseURI).href}")` : undefined;
   // Alternate art uses the article's second image, or a re-framed crop of the main one.
   const sources = special === 'altart' ? [card.alt, card.img] : [card.img];
   const classes = [
@@ -102,7 +104,9 @@ export function Card({
                   {THEMED.includes(finish) && <div className={`fx fx--theme fx--${finish}`} />}
                   {special === 'goldsil' && (
                     <>
-                      <div className="fx fx--goldsil" />
+                      <div className="fx fx--goldsil">
+                        <img src={card.img} alt="" draggable={false} />
+                      </div>
                       <div className="fx fx--goldsil-shine" />
                     </>
                   )}
