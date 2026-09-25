@@ -322,12 +322,12 @@
   z-index: 12;
   background: radial-gradient(
     farthest-corner circle at var(--mx) var(--my),
-    rgb(255 255 255 / 0.55) 0%,
-    rgb(255 255 255 / 0.12) 28%,
-    rgb(0 0 0 / 0.28) 95%
+    rgb(255 255 255 / 0.4) 0%,
+    rgb(255 255 255 / 0.1) 28%,
+    rgb(0 0 0 / 0.25) 95%
   );
   mix-blend-mode: overlay;
-  opacity: calc(var(--hov) * 0.85);
+  opacity: calc(var(--hov) * 0.6);
   transition: opacity 0.4s;
 }
 
@@ -341,12 +341,18 @@
     calc(var(--px) * 100%) calc(var(--py) * 100%),
     center;
   mix-blend-mode: color-dodge;
-  filter: brightness(0.62) contrast(1.35) saturate(1.2);
-  opacity: calc(0.38 + var(--hov) * 0.5);
+  filter: brightness(0.5) contrast(1.4) saturate(1.3);
+  opacity: calc(0.4 + var(--hov) * 0.3);
   transition: opacity 0.4s;
 }
 .fx--artshine {
   z-index: 3;
+}
+/* Foil reflections are strongest where the light is, so the picture always stays readable. */
+.fx--artshine,
+.fx--theme:not(.fx--shattered) {
+  -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgb(0 0 0 / 0.55) 40%, rgb(0 0 0 / 0.25) 85%);
+  mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgb(0 0 0 / 0.55) 40%, rgb(0 0 0 / 0.25) 85%);
 }
 .fx--frameshine {
   z-index: 4;
@@ -700,7 +706,7 @@
 .fx--theme {
   z-index: 3;
   mix-blend-mode: color-dodge;
-  opacity: calc(0.55 + var(--hov) * 0.45);
+  opacity: calc(0.5 + var(--hov) * 0.2);
 }
 /* Cosmos: star field inside the rainbow reflection */
 .fx--cosmos {
@@ -715,7 +721,7 @@
     calc(var(--px) * -40px) calc(var(--py) * 30px),
     calc(var(--px) * 60px) calc(var(--py) * -50px),
     calc(var(--px) * 100%) calc(var(--py) * 100%);
-  filter: brightness(0.8) contrast(1.3) saturate(1.2);
+  filter: brightness(0.55) contrast(1.35) saturate(1.2);
 }
 /* Shattered glass: facets that each catch the light differently */
 .fx--shattered {
@@ -727,14 +733,16 @@
   background-position: center, center, calc(var(--px) * 100%) calc(var(--py) * 100%);
   -webkit-mask-image: linear-gradient(calc(110deg + var(--px) * 40deg), #000 0%, rgb(0 0 0 / 0.35) 50%, #000 100%);
   mask-image: linear-gradient(calc(110deg + var(--px) * 40deg), #000 0%, rgb(0 0 0 / 0.35) 50%, #000 100%);
-  filter: brightness(0.75) contrast(1.4) saturate(1.1);
+  filter: brightness(0.55) contrast(1.4) saturate(1.1);
 }
 /* Cold foil: silver concentric waves around the light */
 .fx--cold {
+  /* silver: lightens through overlay instead of burning to white */
+  mix-blend-mode: overlay;
   background-image:
-    repeating-radial-gradient(circle at var(--mx) var(--my), rgb(210 230 255 / 0.55) 0 1.2cqmin, transparent 1.2cqmin 3.4cqmin),
-    linear-gradient(135deg, #9fb2c8, #eef4ff 50%, #8ea3bd);
-  filter: brightness(0.7) contrast(1.2);
+    repeating-radial-gradient(circle at var(--mx) var(--my), rgb(235 244 255 / 0.55) 0 1.2cqmin, transparent 1.2cqmin 3.4cqmin),
+    linear-gradient(135deg, rgb(150 172 200 / 0.55), rgb(240 246 255 / 0.65) 50%, rgb(130 152 185 / 0.55));
+  opacity: calc(0.75 + var(--hov) * 0.2);
 }
 
 /* ---------- extreme finishes ---------- */
@@ -760,7 +768,7 @@
   opacity: calc(0.7 + var(--hov) * 0.3);
 }
 .f-ghost .card__name {
-  background: linear-gradient(180deg, #8d96a2, #c7ced6);
+  background: linear-gradient(180deg, #5f6874, #97a0ab);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -983,4 +991,15 @@
   50% { box-shadow: 0 0 calc(var(--w) * 0.22) #6be4ff, 0 0 0 2px #fff; }
   75% { box-shadow: 0 0 calc(var(--w) * 0.22) #ff7de9, 0 0 0 2px #fff; }
   100% { box-shadow: 0 0 calc(var(--w) * 0.22) #ff6b6b, 0 0 0 2px #fff; }
+}
+
+/* Whole-card effects fade over the text block so names stay legible. */
+.fx--etch,
+.fx--starlight,
+.f-etched .fx--frameshine {
+  -webkit-mask-image: linear-gradient(180deg, #000 56%, transparent 68%);
+  mask-image: linear-gradient(180deg, #000 56%, transparent 68%);
+}
+.fx--etch {
+  opacity: 0.5;
 }
