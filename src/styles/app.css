@@ -888,3 +888,113 @@ select {
     flex-direction: column;
   }
 }
+
+/* ---------- recycling ---------- */
+.parch {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+.parch b {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--gold);
+}
+.parch:hover {
+  border-color: var(--gold-2);
+}
+.recycle-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: -6px 0 22px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 14px;
+}
+.recycle-bar > span {
+  flex: 1;
+  min-width: 240px;
+}
+.recycle-bar b {
+  color: var(--gold);
+}
+.recycle-bar .btn {
+  padding: 9px 18px;
+  font-size: 12px;
+}
+.modal__recycle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.modal__danger {
+  color: #f3b0a6;
+}
+.shop {
+  width: min(520px, 92vw);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 30px 32px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, #1e1b25, #121016);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
+  animation: rise 0.35s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+.shop__title {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+}
+.shop__balance {
+  margin: -8px 0 0;
+  color: var(--muted);
+}
+.shop__balance b {
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
+  color: var(--gold);
+}
+.shop__block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.shop__block h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.shop__block p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.shop__buy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.shop__buy .btn {
+  padding: 10px 16px;
+  font-size: 12px;
+}
+.shop__close {
+  align-self: flex-end;
+}

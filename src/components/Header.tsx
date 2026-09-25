@@ -10,6 +10,7 @@ interface Props {
   save: SaveData;
   now: number;
   sample: boolean;
+  onShop: () => void;
 }
 
 function fmt(ms: number) {
@@ -17,7 +18,7 @@ function fmt(ms: number) {
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 }
 
-export function Header({ tab, onTab, testMode, onTestMode, save, now, sample }: Props) {
+export function Header({ tab, onTab, testMode, onTestMode, save, now, sample, onShop }: Props) {
   return (
     <header className="topbar">
       <div className="brand">
@@ -53,6 +54,11 @@ export function Header({ tab, onTab, testMode, onTestMode, save, now, sample }: 
             <b>{save.stock}</b> paquet{save.stock > 1 ? 's' : ''}
             <span className="stock__timer">+1 dans {fmt(msUntilNext(save, now))}</span>
           </span>
+        )}
+        {!testMode && (
+          <button className="parch" onClick={onShop} title="Atelier de recyclage : recycler des cartes, acheter des paquets">
+            <b>{save.parchments.toLocaleString('fr-FR')}</b> parchemins
+          </button>
         )}
         <label className="switch" title="Mode test : ouvertures illimitées, sans enregistrement">
           <input type="checkbox" checked={testMode} onChange={(e) => onTestMode(e.target.checked)} />

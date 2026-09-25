@@ -13,10 +13,12 @@ interface Props {
   serial?: Serial;
   entry?: Entry;
   onClose: () => void;
+  /** Recycling controls, when the card comes from the saved collection. */
+  recycle?: { value: number; count: number; onRecycle: (n: number) => void };
 }
 
 /** Card sheet: the only place where the special effect is named. */
-export function CardModal({ card, look, serial, entry, onClose }: Props) {
+export function CardModal({ card, look, serial, entry, onClose, recycle }: Props) {
   const finish = FINISH_BY_ID[look.finish];
   const special = look.special ? SPECIAL_BY_ID[look.special] : null;
   const [flipped, setFlipped] = useState(false);
@@ -110,6 +112,23 @@ export function CardModal({ card, look, serial, entry, onClose }: Props) {
           <a className="btn btn--ghost" href={card.url} target="_blank" rel="noreferrer">
             Lire l’article sur Wikipédia ↗
           </a>
+          {recycle && (
+            <div className="modal__recycle">
+              {recycle.count > 1 && (
+                <button className="btn btn--ghost" onClick={() => recycle.onRecycle(recycle.count - 1)}>
+                  Recycler les {recycle.count - 1} doublons (+{((recycle.count - 1) * recycle.value).toLocaleString('fr-FR')})
+                </button>
+              )}
+              <button
+                className="btn btn--ghost modal__danger"
+                onClick={() => {
+                  if (recycle.count > 1 || confirm('Recycler ton dernier exemplaire de cette version ?')) recycle.onRecycle(1);
+                }}
+              >
+                Recycler 1 exemplaire (+{recycle.value.toLocaleString('fr-FR')})
+              </button>
+            </div>
+          )}
           <button className="btn btn--primary" onClick={onClose}>
             Fermer
           </button>

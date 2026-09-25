@@ -1,17 +1,23 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { RARITIES } from '../game/rarity';
 import { lookRank } from '../game/variants';
-import type { Entry, SaveData } from '../game/storage';
+import { entryKey, type Entry, type SaveData } from '../game/storage';
 import type { CardData, Rarity } from '../game/types';
 import { Card, RarityBadge } from './Card';
 import { BinderBook } from './BinderBook';
 import { CardModal } from './CardModal';
+import type { DuplicateSummary } from './Shop';
 
 interface Props {
   cards: CardData[];
   byId: Map<string, CardData>;
   save: SaveData;
   testMode: boolean;
+  duplicates: DuplicateSummary;
+  entryValue: (key: string) => number;
+  onRecycle: (key: string, n: number) => void;
+  onRecycleDuplicates: () => void;
+  onShop: () => void;
 }
 
 type Sort = 'number' | 'rarity' | 'recent';
@@ -21,7 +27,7 @@ interface Selected {
   entry?: Entry;
 }
 
-export function Binder({ cards, byId, save, testMode }: Props) {
+export function Binder({ cards, byId, save, testMode, duplicates, entryValue, onRecycle, onRecycleDuplicates, onShop }: Props) {
   const [rarity, setRarity] = useState<Rarity | 'all'>('all');
   const [specialOnly, setSpecialOnly] = useState(false);
   const [showMissing, setShowMissing] = useState(false);
@@ -118,6 +124,23 @@ export function Binder({ cards, byId, save, testMode }: Props) {
         ))}
       </div>
 
+      {!testMode && (
+        <div className="recycle-bar">
+          <span>
+            <b>{save.parchments.toLocaleString('fr-FR')}</b> parchemins ·{' '}
+            {duplicates.copies
+              ? `${duplicates.copies} doublon${duplicates.copies > 1 ? 's' : ''} identique${duplicates.copies > 1 ? 's' : ''} (${duplicates.value.toLocaleString('fr-FR')} parchemins)`
+              : 'aucun doublon identique'}
+          </span>
+          <button className="btn btn--primary" disabled={!duplicates.copies} onClick={onRecycleDuplicates}>
+            Recycler tous les doublons
+          </button>
+          <button className="btn btn--ghost" onClick={onShop}>
+            Acheter des paquets
+          </button>
+        </div>
+      )}
+
       <div className="filters">
         <div className="seg" role="tablist">
           <button className={view === 'book' ? 'is-active' : ''} onClick={() => setView('book')}>
@@ -187,6 +210,22 @@ export function Binder({ cards, byId, save, testMode }: Props) {
           serial={selected.entry?.serial}
           entry={selected.entry}
           onClose={() => setSelected(null)}
+          recycle={
+            selected.entry && !testMode
+              ? (() => {
+                  const e = selected.entry;
+                  const key = entryKey(e.id, e, e.serial);
+                  return {
+                    value: entryValue(key),
+                    count: e.count,
+                    onRecycle: (n: number) => {
+                      onRecycle(key, n);
+                      setSelected(n >= e.count ? null : { ...selected, entry: { ...e, count: e.count - n } });
+                    },
+                  };
+                })()
+              : undefined
+          }
         />
       )}
     </section>

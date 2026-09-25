@@ -16,6 +16,8 @@ export interface SaveData {
   /** Timestamp from which the next pack is being earned. */
   lastAccrual: number;
   opened: number;
+  /** Parchemins earned by recycling cards, spent on packs. */
+  parchments: number;
   collection: Record<string, Entry>;
 }
 
@@ -50,11 +52,11 @@ function migrate(s: SaveData): SaveData {
     const prev = collection[key];
     collection[key] = prev ? { ...prev, count: prev.count + e.count, first: Math.min(prev.first, e.first) } : e;
   }
-  return { ...s, collection };
+  return { ...s, parchments: s.parchments ?? 0, collection };
 }
 
 export function freshSave(now = Date.now()): SaveData {
-  return { stock: 1, lastAccrual: now, opened: 0, collection: {} };
+  return { stock: 1, lastAccrual: now, opened: 0, parchments: 0, collection: {} };
 }
 
 export function loadSave(): SaveData {
@@ -112,4 +114,21 @@ export function markNewAgainst(s: SaveData, pulls: Pull[]): Pull[] {
     seen.add(key);
     return { ...p, isNew };
   });
+}
+
+/** Recycles `n` copies of one collection entry (removing it when none are left). */
+export function recycleEntry(s: SaveData, key: string, n: number, value: number): SaveData {
+  const e = s.collection[key];
+  if (!e || n <= 0) return s;
+  const take = Math.min(n, e.count);
+  const collection = { ...s.collection };
+  if (take >= e.count) delete collection[key];
+  else collection[key] = { ...e, count: e.count - take };
+  return { ...s, collection, parchments: s.parchments + take * value };
+}
+
+/** Buys packs with parchemins. */
+export function buyPacks(s: SaveData, n: number, price: number): SaveData {
+  if (n <= 0 || s.parchments < n * price) return s;
+  return { ...s, parchments: s.parchments - n * price, stock: s.stock + n };
 }

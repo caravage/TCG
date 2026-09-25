@@ -102,10 +102,24 @@ Les poids exacts sont dans `src/game/variants.ts` ; l’onglet *Effets* (mode te
 Pour le prototype, les numéros sont **simulés** : sans serveur, l'unicité mondiale n'est pas
 garantie.
 
-### Doublons
+### Doublons et recyclage
 
-Une carte n'est un doublon que si **la même carte avec la même variante** (et le même numéro) est
-déjà dans le cahier. Une autre variante compte comme une nouvelle entrée.
+Une carte n'est un doublon que si **la même carte avec le même aspect** (finition, Full Art,
+variante, numéro) est déjà dans le cahier.
+
+Les cartes se recyclent en **parchemins** (atelier dans l'en-tête, ou fiche de la carte) ;
+« Recycler tous les doublons » garde un exemplaire de chaque version et recycle le reste.
+
+| Valeur de base | C | UC | R | UR | L | M |
+|---|---|---|---|---|---|---|
+| parchemins | 1 | 3 | 10 | 40 | 150 | 600 |
+
+Multiplicateurs : Reverse ×1,5 · Holo ×2 · Cosmos/Verre brisé/Cold ×3 · Gravé ×4 ·
+Gold/Rainbow/Ghost/Starlight ×15 · Full Art ×3 · Black Label/Alternate Art/Silhouette dorée ×10 ·
+Signée ×20 · numérotée /100 ×10, /50 ×20, /10 ×50, 1/1 ×200.
+
+**Un paquet coûte 100 parchemins** — la valeur moyenne d'un paquet entièrement recyclé
+(~98, tirée par les hits ; un paquet sans hit vaut ~20).
 
 ## Structure
 
