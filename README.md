@@ -15,6 +15,7 @@ npm run build        # build statique dans dist/
 - **Mode normal** : 1 paquet toutes les 15 minutes, cumulable sans limite. Les cartes sont
   enregistrées dans le cahier (stockage du navigateur). « Tout ouvrir » ouvre le stock d'un coup
   (50 paquets max) : les cartes ordinaires sont étalées, les hits restent face cachée à révéler.
+  Dès 500 paquets en réserve, « Ouvrir 500 paquets » ouvre un lot géant.
 - **Mode test** (interrupteur en haut à droite, ou `?mode=test`) : ouvertures illimitées, rien
   n'est enregistré, et l'onglet **Effets** montre tous les cadres et variantes.
 

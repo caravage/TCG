@@ -17,6 +17,8 @@ interface Props {
 
 type State = 'down' | 'charging' | 'up';
 
+const REST_PAGE = 210;
+
 /** Many packs at once: the ordinary cards are laid out face up, the hits wait face down. */
 export function BulkOpening({ pulls, packs, godPacks, particleColors, canOpenMore, onAgain, onGoBinder }: Props) {
   // Best hits last so the grid builds up to them.
@@ -30,6 +32,8 @@ export function BulkOpening({ pulls, packs, godPacks, particleColors, canOpenMor
   );
   const [state, setState] = useState<Record<string, State>>({});
   const [sheet, setSheet] = useState<Pull | null>(null);
+  // Hundreds of packs give thousands of cards: show them a page at a time.
+  const [shown, setShown] = useState(REST_PAGE);
   const refs = useRef<Record<string, HTMLDivElement | null>>({});
   const auto = useRef<number[]>([]);
 
@@ -52,7 +56,8 @@ export function BulkOpening({ pulls, packs, godPacks, particleColors, canOpenMor
   const revealAll = () => {
     hits
       .filter((p) => (state[p.uid] ?? 'down') === 'down')
-      .forEach((p, i) => auto.current.push(window.setTimeout(() => reveal(p), i * 650)));
+      // Big batches reveal faster, so « Tout révéler » never takes more than ~30 s.
+      .forEach((p, i, all) => auto.current.push(window.setTimeout(() => reveal(p), i * Math.min(650, 30000 / all.length))));
   };
 
   const left = hits.filter((p) => (state[p.uid] ?? 'down') !== 'up').length;
@@ -117,13 +122,20 @@ export function BulkOpening({ pulls, packs, godPacks, particleColors, canOpenMor
           <h3>Le reste ({rest.length})</h3>
         </div>
         <div className="bulk__rest">
-          {rest.map((p) => (
+          {rest.slice(0, shown).map((p) => (
             <div key={p.uid} className="bulk__card" onClick={() => setSheet(p)}>
               <Card card={p.card} look={p} serial={p.serial} width={112} />
               {p.isNew && <span className="badge-new">Nouveau</span>}
             </div>
           ))}
         </div>
+        {shown < rest.length && (
+          <div className="bulk__more">
+            <button className="btn btn--ghost" onClick={() => setShown((n) => n + REST_PAGE * 2)}>
+              Afficher plus ({rest.length - shown} restantes)
+            </button>
+          </div>
+        )}
       </section>
 
       <div className="summary__actions">

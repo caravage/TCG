@@ -757,3 +757,8 @@
   top: -8px;
   right: -8px;
 }
+.bulk__more {
+  display: flex;
+  justify-content: center;
+  padding-top: 22px;
+}

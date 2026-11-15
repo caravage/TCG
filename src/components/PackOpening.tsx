@@ -22,6 +22,8 @@ type Phase = 'idle' | 'burst' | 'reveal' | 'summary' | 'bulk';
 
 /** Packs opened at once by « Tout ouvrir » (keeps the page light). */
 const BULK_MAX = 50;
+/** The big batch, offered once the reserve holds that many packs. */
+const BIG_BULK = 500;
 const TEST_BULK = 10;
 
 const RARITY_GLOW = ['#d9d5cb', '#2e9e6b', '#2f6fd6', '#8a4be0', '#e8741a', '#d6243a'];
@@ -155,8 +157,10 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
 
   const bulkCount = testMode ? TEST_BULK : Math.min(stock, BULK_MAX);
 
-  const openAll = () => {
-    const packs = Array.from({ length: bulkCount - 1 }, () => openPack(pools));
+  const bigAvailable = testMode || stock >= BIG_BULK;
+
+  const openAll = (count = bulkCount) => {
+    const packs = Array.from({ length: count - 1 }, () => openPack(pools));
     packs.unshift(pack); // the pack on screen is part of the batch
     const pulls = onCommit(packs.flatMap((p) => p.pulls), packs.length);
     setBulk({ pulls, packs: packs.length, gods: packs.filter((p) => p.god).length });
@@ -199,8 +203,13 @@ export function PackOpening({ pools, canOpen, testMode, stock, onCommit, onGoBin
                   Glisse sur le haut du paquet pour le déchirer
                   {!testMode && <small>{stock} paquet{stock > 1 ? 's' : ''} en réserve</small>}
                   {bulkCount >= 2 && (
-                    <button className="btn btn--ghost opening__all" onClick={openAll}>
+                    <button className="btn btn--ghost opening__all" onClick={() => openAll()}>
                       Tout ouvrir ({bulkCount} paquets)
+                    </button>
+                  )}
+                  {bigAvailable && (
+                    <button className="btn btn--primary opening__all" onClick={() => openAll(BIG_BULK)}>
+                      Ouvrir {BIG_BULK} paquets
                     </button>
                   )}
                 </>
